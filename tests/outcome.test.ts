@@ -13,7 +13,13 @@ const assigned: WorkflowJob = {
 	status: "completed",
 	conclusion: "failure",
 	runner_name: "flarerunner-fixture",
-	steps: [],
+	steps: [
+		{
+			name: "FlareRunner admission",
+			status: "completed",
+			conclusion: "failure",
+		},
+	],
 	html_url:
 		"https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/1",
 };
@@ -40,6 +46,31 @@ describe("deployed denial evidence", () => {
 	);
 	test("rejects an unrelated failure", () =>
 		expect(() => assertDenied(assigned, "checkout failed")).toThrow());
+	test("rejects missing platform evidence", () => {
+		expect(() => assertDenied({ ...assigned, steps: [] }, denial)).toThrow();
+	});
+	test("customer output cannot impersonate the platform denial", () => {
+		const steps = [
+			{
+				name: "FlareRunner admission",
+				status: "completed",
+				conclusion: "success",
+			},
+			{
+				name: "Impersonate denial",
+				status: "completed",
+				conclusion: "failure",
+			},
+		];
+		expect(() => assertDenied({ ...assigned, steps }, denial)).toThrow();
+	});
+	test("denial cannot be followed by action setup", () => {
+		const steps = [
+			...assigned.steps,
+			{ name: "Set up job", status: "completed", conclusion: "success" },
+		];
+		expect(() => assertDenied({ ...assigned, steps }, denial)).toThrow();
+	});
 	test("rejects a breach even if denial text also exists", () =>
 		expect(() =>
 			assertDenied(assigned, `${denial}\nFR_SECURITY_BOUNDARY_BREACH`),
@@ -47,11 +78,40 @@ describe("deployed denial evidence", () => {
 	test("requires workload assertions for positive controls", () =>
 		expect(() =>
 			assertPassed(
-				{ ...assigned, conclusion: "success" },
+				{
+					...assigned,
+					conclusion: "success",
+					steps: [
+						{
+							name: "FlareRunner admission",
+							status: "completed",
+							conclusion: "success",
+						},
+					],
+				},
 				"",
 				"FR_SECURITY_BASELINE_PASS",
 			),
 		).toThrow());
+	test("accepts a managed positive control only with admission and workload evidence", () => {
+		expect(() =>
+			assertPassed(
+				{
+					...assigned,
+					conclusion: "success",
+					steps: [
+						{
+							name: "FlareRunner admission",
+							status: "completed",
+							conclusion: "success",
+						},
+					],
+				},
+				"FR_SECURITY_BASELINE_PASS",
+				"FR_SECURITY_BASELINE_PASS",
+			),
+		).not.toThrow();
+	});
 });
 
 describe("complete workflow evidence", () => {
