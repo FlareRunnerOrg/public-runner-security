@@ -1,0 +1,72 @@
+name: Public runner security
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: public-security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+jobs:
+  baseline:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.3
+          no-cache: true
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: cache
+        with:
+          path: .security-cache
+          key: public-security-${{ vars.FR_SECURITY_CACHE_EPOCH }}
+      - name: Exercise credential, cache, privacy and Internet boundaries
+        run: bun run probe baseline
+        env:
+          GH_JOB_TOKEN: ${{ github.token }}
+          CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+  isolation:
+    needs: baseline
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.3
+          no-cache: true
+      - name: Check that previous-job files did not survive
+        run: bun run probe isolation
+  mask:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    environment: security-canary
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.3
+          no-cache: true
+      - name: Verify a dummy secret can be used and masked in trusted work
+        run: bun run probe mask
+        env:
+          SECURITY_CANARY: ${{ secrets.FR_SECURITY_CANARY }}
+          SECURITY_CANARY_SHA256: ${{ vars.FR_SECURITY_CANARY_SHA256 }}

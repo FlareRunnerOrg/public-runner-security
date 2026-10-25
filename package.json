@@ -1,0 +1,10 @@
+{
+	"name": "flarerunner-public-security-fixtures",
+	"private": true,
+	"packageManager": "bun@1.4.3",
+	"scripts": {
+		"test": "bun test",
+		"probe": "bun tests/probe.ts",
+		"verify": "bun scripts/verify-run.ts"
+	}
+}
