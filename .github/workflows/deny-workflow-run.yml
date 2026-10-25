@@ -1,0 +1,17 @@
+name: Reject privileged workflow completion trigger
+on:
+  workflow_run:
+    workflows: [Public runner security]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  workflow-run:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1

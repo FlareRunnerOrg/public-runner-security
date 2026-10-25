@@ -13,7 +13,7 @@ repositories, retrieve cloud metadata credentials, exploit kernels, or generate 
 | Platform credentials | Known platform credential variables are absent from job environment |
 | Same-repository and fork PRs | Secretless positive controls run on managed runners |
 | Project secret, write token, OIDC in an untrusted job | Runner denies admission before any customer step |
-| `pull_request_target` | Runner denies the privileged trigger before customer code |
+| `pull_request_target` and `workflow_run` | Runner denies privileged triggers before customer code |
 | PR cache poisoning | Main restores trusted data; PRs restore only their own scope, including across separate PRs |
 | Disk persistence | Files written by a previous job are absent in the next job |
 | Dummy secret masking | Trusted work can use a generated fixture canary; logs redact its value |
