@@ -13,6 +13,27 @@ export interface WorkflowJob {
 	html_url: string;
 }
 
+export function assertJobCoverage(
+	jobs: WorkflowJob[],
+	expected: string[],
+	allowedSkipped: string[] = [],
+): WorkflowJob[] {
+	for (const name of expected) {
+		const matches = jobs.filter((job) => job.name === name);
+		if (matches.length !== 1)
+			throw new Error(`Expected exactly one fixture job: ${name}`);
+		if (matches[0].conclusion === "skipped")
+			throw new Error(`Required fixture job was skipped: ${name}`);
+	}
+	for (const job of jobs) {
+		if (expected.includes(job.name)) continue;
+		if (allowedSkipped.includes(job.name) && job.conclusion === "skipped")
+			continue;
+		throw new Error(`Unexpected fixture job or outcome: ${job.name}`);
+	}
+	return jobs.filter((job) => expected.includes(job.name));
+}
+
 export function assertManaged(job: WorkflowJob): void {
 	if (!job.runner_name?.startsWith("flarerunner-"))
 		throw new Error(`No managed-runner assignment: ${job.name}`);

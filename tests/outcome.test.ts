@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	assertDenied,
+	assertJobCoverage,
 	assertPassed,
 	type WorkflowJob,
 } from "../scripts/outcome.ts";
@@ -51,4 +52,45 @@ describe("deployed denial evidence", () => {
 				"FR_SECURITY_BASELINE_PASS",
 			),
 		).toThrow());
+});
+
+describe("complete workflow evidence", () => {
+	const job = (name: string, conclusion = "success"): WorkflowJob => ({
+		...assigned,
+		name,
+		conclusion,
+	});
+	test("requires every expected job", () => {
+		expect(() =>
+			assertJobCoverage([job("baseline")], ["baseline", "isolation"]),
+		).toThrow();
+	});
+	test("rejects partial skips", () => {
+		expect(() =>
+			assertJobCoverage(
+				[job("baseline"), job("isolation", "skipped")],
+				["baseline", "isolation"],
+			),
+		).toThrow();
+	});
+	test("rejects duplicate or unexpected jobs", () => {
+		expect(() =>
+			assertJobCoverage([job("baseline"), job("baseline")], ["baseline"]),
+		).toThrow();
+		expect(() =>
+			assertJobCoverage([job("baseline"), job("other")], ["baseline"]),
+		).toThrow();
+	});
+	test("allows only the intentionally omitted PR masking job", () => {
+		expect(
+			assertJobCoverage(
+				[job("baseline"), job("mask", "skipped")],
+				["baseline"],
+				["mask"],
+			),
+		).toHaveLength(1);
+		expect(() =>
+			assertJobCoverage([job("baseline"), job("mask")], ["baseline"], ["mask"]),
+		).toThrow();
+	});
 });
