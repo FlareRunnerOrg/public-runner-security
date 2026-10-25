@@ -39,12 +39,23 @@ export function assertManaged(job: WorkflowJob): void {
 		throw new Error(`No managed-runner assignment: ${job.name}`);
 }
 
+function assertAdmissionStep(job: WorkflowJob, conclusion: string): void {
+	const admission = job.steps[0];
+	if (admission?.name !== "FlareRunner admission")
+		throw new Error(`Missing platform admission step: ${job.name}`);
+	if (admission.status !== "completed" || admission.conclusion !== conclusion)
+		throw new Error(`Unexpected platform admission result: ${job.name}`);
+}
+
 export function assertDenied(job: WorkflowJob, log: string): void {
 	assertManaged(job);
 	if (job.status !== "completed")
 		throw new Error(`Job is not terminal: ${job.name}`);
 	if (job.conclusion !== "failure")
 		throw new Error(`Expected admission failure: ${job.name}`);
+	assertAdmissionStep(job, "failure");
+	if (job.steps.slice(1).some((step) => step.conclusion !== "skipped"))
+		throw new Error(`A step initialized after admission denial: ${job.name}`);
 	if (!log.includes("FlareRunner did not authorize job execution."))
 		throw new Error(`Missing authoritative admission denial: ${job.name}`);
 	if (log.includes("FR_SECURITY_BOUNDARY_BREACH"))
@@ -60,6 +71,7 @@ export function assertPassed(
 	marker: string,
 ): void {
 	assertManaged(job);
+	assertAdmissionStep(job, "success");
 	if (job.conclusion !== "success")
 		throw new Error(`Positive control failed: ${job.name}`);
 	if (!log.includes(marker))
