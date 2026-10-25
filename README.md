@@ -64,3 +64,7 @@ separate provider and authenticated FlareRunner observations. These tests do not
 establish immunity from VM escapes, malicious outbound traffic, stolen cards or
 unknown vulnerabilities. They are regression evidence, not a security certification.
 Controlled integration tests for FlareRunner public GitHub Actions runner security boundaries
+
+## Qualification fixture
+
+Owned fork PR: harmless documentation change for public runner isolation tests.
