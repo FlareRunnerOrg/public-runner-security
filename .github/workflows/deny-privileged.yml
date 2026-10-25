@@ -1,0 +1,16 @@
+name: Reject privileged PR trigger
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  pull-request-target:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
