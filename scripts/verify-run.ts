@@ -1,4 +1,9 @@
-import { assertDenied, assertPassed, type WorkflowJob } from "./outcome.ts";
+import {
+	assertDenied,
+	assertJobCoverage,
+	assertPassed,
+	type WorkflowJob,
+} from "./outcome.ts";
 
 const repository = "FlareRunnerOrg/public-runner-security";
 const [runId, kind] = Bun.argv.slice(2);
@@ -32,6 +37,7 @@ const run: {
 	html_url: string;
 	head_sha: string;
 	event: string;
+	name: string;
 } = JSON.parse(await gh(["api", `repos/${repository}/actions/runs/${runId}`]));
 if (run.status !== "completed")
 	throw new Error("Evidence is not terminal; inspect the run and retry later");
@@ -41,11 +47,30 @@ const data: { jobs: WorkflowJob[] } = JSON.parse(
 		`repos/${repository}/actions/runs/${runId}/jobs?filter=latest&per_page=100`,
 	]),
 );
-const jobs = data.jobs.filter((job) => job.conclusion !== "skipped");
-if (!jobs.length)
-	throw new Error(
-		"No executed fixture jobs; a disabled gate is not a passing test",
-	);
+let expected: string[];
+let allowedSkipped: string[] = [];
+if (kind === "baseline" && run.name === "Public runner security") {
+	expected = ["baseline", "isolation"];
+	if (run.event === "pull_request") allowedSkipped = ["mask"];
+	else expected.push("mask");
+} else if (kind === "cancelled" && run.name === "Runner cancellation") {
+	expected = ["lifetime"];
+} else if (kind === "denied") {
+	switch (run.name) {
+		case "Reject credential-bearing untrusted jobs":
+			expected = ["project-secret", "write-token", "oidc"];
+			break;
+		case "Reject privileged PR trigger":
+			expected = ["pull-request-target"];
+			break;
+		case "Reject privileged workflow completion trigger":
+			expected = ["workflow-run"];
+			break;
+		default:
+			throw new Error("Unexpected denial workflow");
+	}
+} else throw new Error("Workflow does not match the expected evidence kind");
+const jobs = assertJobCoverage(data.jobs, expected, allowedSkipped);
 for (const job of jobs) {
 	const log = await gh([
 		"run",
