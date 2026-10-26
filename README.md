@@ -58,6 +58,14 @@ and runner names with the release evidence; never retain tokens or secret values
 ## Limits of the evidence
 
 Passing fixtures establishes these specific deployed behaviors. GitHub runner
+admission failures can also result from funding, assignment or provider availability.
+The log checker verifies the platform step and absence of customer execution;
+corroborate each negative case's intended credential or event rejection with
+operator telemetry for that job. A generic admission failure alone does not prove
+the tested restriction. Preserve initial failures and retries separately, and do
+not infer successful concurrent scheduling from cases that passed after serial retries.
+
+GitHub runner
 deregistration does not itself prove Cloudflare VM destruction, and GitHub log
 masking does not by itself prove first-party retained-log masking. Those require
 separate provider and authenticated FlareRunner observations. These tests do not
