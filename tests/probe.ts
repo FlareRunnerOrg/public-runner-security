@@ -55,8 +55,6 @@ async function baseline(): Promise<void> {
 			`Platform credential entered the job environment: ${name}`,
 		);
 	}
-	const internet = await request("https://example.com/", { method: "HEAD" });
-	assert.equal(internet.status, 200, "Ordinary outbound HTTPS is unavailable");
 	const privateProduct = await request("https://flarerunner.com/v1/product");
 	assert.equal(
 		privateProduct.status,
@@ -74,6 +72,14 @@ async function baseline(): Promise<void> {
 		accept: "application/vnd.github+json",
 		"content-type": "application/json",
 	};
+	const internet = await request(`https://api.github.com/repos/${repository}`, {
+		headers,
+	});
+	assert.equal(internet.status, 200, "Public GitHub read over HTTPS failed");
+	const visibleRepository: { full_name: string; private: boolean } =
+		await internet.json();
+	assert.equal(visibleRepository.full_name, repository);
+	assert.equal(visibleRepository.private, false);
 	const mutation = await request(
 		`https://api.github.com/repos/${repository}/git/refs`,
 		{
