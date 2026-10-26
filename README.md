@@ -74,3 +74,5 @@ unknown vulnerabilities. They are regression evidence, not a security certificat
 Controlled integration tests for FlareRunner public GitHub Actions runner security boundaries
 
 Controlled release e2b814e qualification: same-repository PR scope B.
+
+Release qualification: repeat the second PR positive control with a fresh run identity.
