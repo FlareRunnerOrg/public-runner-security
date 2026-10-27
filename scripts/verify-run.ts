@@ -82,7 +82,9 @@ for (const job of jobs) {
 				? "FR_SECURITY_ISOLATION_PASS"
 				: job.name === "mask"
 					? "FR_SECURITY_MASK_PASS"
-					: "FR_SECURITY_BASELINE_PASS";
+					: job.name === "guest-root"
+						? "FR_SECURITY_GUEST_ROOT_PASS"
+						: "FR_SECURITY_BASELINE_PASS";
 		assertPassed(job, log, marker);
 		if (job.name === "mask" && !log.includes("FR_SECURITY_MASK ***"))
 			throw new Error("The masked dummy-canary marker is missing");

@@ -47,7 +47,7 @@ export function contractFor(run: FixtureRun): Contract {
 			if (run.event !== "pull_request") assert.equal(run.head_branch, "main");
 			contract = {
 				kind: "baseline",
-				expected: ["baseline", "isolation"],
+				expected: ["baseline", "isolation", "guest-root"],
 				allowedSkipped: run.event === "pull_request" ? ["mask"] : [],
 				reasons: {},
 			};

@@ -29,6 +29,7 @@ code, and never downloads or executes its artifacts. This follows GitHub’s
 | --- | --- |
 | Public main, same-repository PR, and owned-fork PR | Secretless CI succeeds with normal HTTPS access |
 | Repository write with the job token | GitHub returns 403 |
+| Job token used against FlareRunner’s private product API | FlareRunner returns 401 |
 | Project secret in an untrusted job | `untrusted_secrets`, before customer code |
 | Secret with `permissions: {}` | Still `untrusted_secrets`; token scopes do not remove delivered secrets |
 | Contents-write, checks-write, or Actions-read token | `untrusted_token_permissions` |
@@ -38,6 +39,7 @@ code, and never downloads or executes its artifacts. This follows GitHub’s
 | `pull_request_target` or `workflow_run` | `privileged_event`, before customer code |
 | PR cache poisoning | Main restores trusted data; each PR has its own cache scope |
 | Files left by a previous job | Absent in the next job |
+| Root inside the job guest | Sudo works; platform credentials and operator APIs remain inaccessible |
 | Dummy secret used by trusted main | Usable by the job and masked in its logs |
 | Cancellation | Started workload stops and its runner registration disappears |
 

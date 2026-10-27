@@ -54,7 +54,11 @@ describe("trusted verifier contract", () => {
 			path: ".github/workflows/public-security.yml",
 			conclusion: "success",
 		};
-		expect(contractFor(baseline).expected).toEqual(["baseline", "isolation"]);
+		expect(contractFor(baseline).expected).toEqual([
+			"baseline",
+			"isolation",
+			"guest-root",
+		]);
 		expect(contractFor(baseline).allowedSkipped).toEqual(["mask"]);
 		expect(
 			contractFor({
@@ -62,7 +66,7 @@ describe("trusted verifier contract", () => {
 				event: "workflow_dispatch",
 				head_branch: "main",
 			}).expected,
-		).toEqual(["baseline", "isolation", "mask"]);
+		).toEqual(["baseline", "isolation", "guest-root", "mask"]);
 		expect(() => contractFor({ ...baseline, conclusion: "failure" })).toThrow();
 	});
 	test("privileged trigger fixtures cannot be substituted with an ordinary PR", () => {
