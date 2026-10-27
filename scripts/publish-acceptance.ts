@@ -1,5 +1,6 @@
 import { appendFile } from "node:fs/promises";
 import assert from "node:assert/strict";
+import { publishAcceptanceStatus } from "./acceptance-publication.ts";
 import {
 	assessAcceptance,
 	assertAnchor,
@@ -26,30 +27,6 @@ const readRun = async (id: number): Promise<AcceptanceRun> =>
 	JSON.parse(await gh(["api", `repos/${repository}/actions/runs/${id}`]));
 const anchor = await readRun(Number(runId));
 assertAnchor(anchor);
-const check: { id: number } = JSON.parse(
-	await gh(
-		[
-			"api",
-			"--method",
-			"POST",
-			`repos/${repository}/check-runs`,
-			"--input",
-			"-",
-		],
-		JSON.stringify({
-			name: "Security acceptance",
-			head_sha: anchor.head_sha,
-			external_id: `security-acceptance:${anchor.id}:${anchor.run_attempt}:${process.env.GITHUB_RUN_ID}`,
-			status: "in_progress",
-			details_url: details,
-			output: {
-				title: "Security acceptance in progress",
-				summary: "Waiting for the complete required suite on this revision.",
-			},
-		}),
-	),
-);
-assert(Number.isSafeInteger(check.id) && check.id > 0);
 
 let report: AcceptanceReport = {
 	state: "pending",
@@ -59,38 +36,17 @@ let report: AcceptanceReport = {
 	productionSha: null,
 	rows: [],
 };
+let statusPublished = false;
 async function publish(final: boolean): Promise<void> {
 	const markdown = renderReport(report);
-	await gh(
-		[
-			"api",
-			"--method",
-			"PATCH",
-			`repos/${repository}/check-runs/${check.id}`,
-			"--input",
-			"-",
-		],
-		JSON.stringify({
-			status: final ? "completed" : "in_progress",
-			...(final
-				? {
-						conclusion:
-							report.state === "passed"
-								? "success"
-								: report.state === "not_run"
-									? "action_required"
-									: "failure",
-					}
-				: {}),
-			output: {
-				title: markdown.split("\n")[0].replace("## ", ""),
-				summary: markdown,
-			},
-		}),
-	);
+	if (!statusPublished || final) {
+		await publishAcceptanceStatus(report, details, final);
+		statusPublished = true;
+	}
 	if (final && process.env.GITHUB_STEP_SUMMARY)
 		await appendFile(process.env.GITHUB_STEP_SUMMARY, markdown);
 }
+await publish(false);
 
 const verified = new Map<string, VerifiedRun>();
 try {
