@@ -9,6 +9,7 @@ permissions:
 jobs:
   workflow-run:
     name: "Attack probe — expected rejection: workflow-run"
+    continue-on-error: true
     if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}

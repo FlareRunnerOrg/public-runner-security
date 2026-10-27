@@ -41,9 +41,15 @@ GitHub’s job metadata and logs for every required probe. A rejected attack mus
 An attack that runs, an unrelated failure, a missing probe, a timeout, or a
 cancellation fails verification. Customer output cannot impersonate the platform
 step. Jobs labelled **Attack probe — expected rejection** intentionally show
-`Failure` when the runner rejects them. The acceptance report shows whether that
-rejection passed its security assertion. Raw jobs and historical failures stay
-available as evidence.
+`Failure` when the runner rejects them. Their workflows use GitHub's job-level
+`continue-on-error` so these expected failures do not send routine failed-workflow
+emails. The job results and admission logs stay available as evidence.
+
+A green probe workflow is not a security verdict. **Security verdict** and
+**Security acceptance** still fail for executed attacks, missing or skipped probes,
+incorrect denials, infrastructure errors and failed positive controls. Those checks
+remain fatal and produce the usual failure notifications. Use their results to
+judge the suite; historical failures are preserved.
 
 The verifier runs on GitHub-hosted infrastructure with read-only permissions. It
 checks out the protected branch’s verifier revision, never the triggering PR’s

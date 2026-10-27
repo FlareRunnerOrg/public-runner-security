@@ -8,6 +8,7 @@ permissions:
 jobs:
   project-secret:
     name: "Attack probe — expected rejection: project-secret"
+    continue-on-error: true
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
@@ -23,6 +24,7 @@ jobs:
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   write-token:
     name: "Attack probe — expected rejection: write-token"
+    continue-on-error: true
     needs: project-secret
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     permissions:
@@ -36,6 +38,7 @@ jobs:
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   oidc:
     name: "Attack probe — expected rejection: oidc"
+    continue-on-error: true
     needs: write-token
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     permissions:
