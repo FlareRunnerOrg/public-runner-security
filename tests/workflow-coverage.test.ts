@@ -75,3 +75,40 @@ test("every automatic attack/control workflow starts a trusted security verdict"
 	);
 	expect(workflow.on.workflow_run.types).toEqual(["completed"]);
 });
+
+test.each([
+	{
+		file: "deny-untrusted.yml",
+		jobs: ["project-secret", "write-token", "oidc"],
+	},
+	{
+		file: "deny-escalation.yml",
+		jobs: [
+			"empty-token-secret",
+			"artifact-read",
+			"checks-write",
+			"job-container-secret",
+			"service-container-secret",
+			"docker-action-write-token",
+		],
+	},
+])(
+	"$file runs every expected rejection without exceeding one active probe",
+	async (fixture) => {
+		const source = await Bun.file(
+			new URL(`../.github/workflows/${fixture.file}`, import.meta.url),
+		).text();
+		const workflow = Bun.YAML.parse(source) as {
+			jobs: { [name: string]: { needs?: string; if: string } };
+		};
+		for (const [index, name] of fixture.jobs.entries()) {
+			expect(workflow.jobs[name].needs).toBe(
+				index === 0 ? undefined : fixture.jobs[index - 1],
+			);
+			// Expected failure must not skip the next attack or weaken its explicit opt-in.
+			expect(workflow.jobs[name].if).toContain(
+				"always() && vars.FR_SECURITY_TEST_ENABLED == 'true'",
+			);
+		}
+	},
+);

@@ -51,7 +51,7 @@ jobs:
       - name: Check that previous-job files did not survive
         run: bun run probe isolation
   guest-root:
-    needs: baseline
+    needs: isolation
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
