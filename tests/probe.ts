@@ -117,8 +117,9 @@ async function baseline(): Promise<void> {
 		headers,
 	});
 	assert.equal(internet.status, 200, "Public GitHub read over HTTPS failed");
-	const visibleRepository: { full_name: string; private: boolean } =
-		await internet.json();
+	const visibleRepository: { full_name: string; private: boolean } = JSON.parse(
+		await internet.text(),
+	);
 	assert.equal(visibleRepository.full_name, repository);
 	assert.equal(visibleRepository.private, false);
 	const mutation = await request(

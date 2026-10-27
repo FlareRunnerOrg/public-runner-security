@@ -1,4 +1,5 @@
 name: Reject privileged workflow completion trigger
+run-name: "Attack probe — expected rejection: workflow completion / source ${{ github.event.workflow_run.id }}"
 on:
   workflow_run:
     workflows: [Public runner security]

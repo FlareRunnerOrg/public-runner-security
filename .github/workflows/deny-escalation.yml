@@ -12,7 +12,9 @@ jobs:
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 3
     permissions: {}
-    environment: security-canary
+    environment:
+      name: security-canary
+      deployment: false
     env:
       SECURITY_CANARY: ${{ secrets.FR_SECURITY_CANARY }}
     steps:
@@ -51,7 +53,9 @@ jobs:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 3
-    environment: security-canary
+    environment:
+      name: security-canary
+      deployment: false
     container:
       image: ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
       env:
@@ -66,7 +70,9 @@ jobs:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 3
-    environment: security-canary
+    environment:
+      name: security-canary
+      deployment: false
     services:
       untrusted:
         image: ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac

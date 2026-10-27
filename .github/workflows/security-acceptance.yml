@@ -1,0 +1,38 @@
+name: Security acceptance
+run-name: Security acceptance for fixture run ${{ github.event.workflow_run.id || inputs.fixture_run_id }}
+on:
+  workflow_run:
+    workflows: [Fixture checks]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      fixture_run_id:
+        description: Fixture checks run for a main push or PR to verify again
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+  checks: write
+jobs:
+  acceptance:
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.event == 'pull_request' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out trusted report source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: FlareRunnerOrg/public-runner-security
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+          no-cache: true
+      - name: Publish the complete acceptance result on the tested commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FIXTURE_RUN_ID: ${{ github.event.workflow_run.id || inputs.fixture_run_id }}
+          FR_SECURITY_TEST_ENABLED: ${{ vars.FR_SECURITY_TEST_ENABLED }}
+        run: bun scripts/publish-acceptance.ts "$FIXTURE_RUN_ID"

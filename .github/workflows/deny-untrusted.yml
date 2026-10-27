@@ -11,7 +11,9 @@ jobs:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 3
-    environment: security-canary
+    environment:
+      name: security-canary
+      deployment: false
     env:
       SECURITY_CANARY: ${{ secrets.FR_SECURITY_CANARY }}
     steps:

@@ -1,11 +1,36 @@
 # Public runner security tests
 
+[![Security acceptance](https://github.com/FlareRunnerOrg/public-runner-security/actions/workflows/security-acceptance.yml/badge.svg?branch=main)](https://github.com/FlareRunnerOrg/public-runner-security/actions/workflows/security-acceptance.yml)
+
 This is FlareRunner’s public acceptance suite. It runs controlled attack fixtures
 against our production runners using a dummy secret and disposable branches.
 
+## Read the overall result
+
+Open **Security acceptance** on the tested commit or PR, or follow the badge above.
+Its report lists each required test, its result and its evidence. A rejected attack
+appears as **Passed — blocked before execution**. A missing workflow, wrong denial,
+executed attack or failed positive control makes acceptance fail. While work is
+running the check stays pending; disabled testing is **Not run**, never a green pass.
+
+Each report names its scope, tested commit, date and production release observed
+before and after verification. A same-repository PR requires the positive controls
+and all eleven admission rejection probes. A main push requires trusted controls,
+including masking, and the privileged completion rejection. Fork reports explicitly
+exclude the credential matrices that GitHub does not run for forks. These scoped
+CI reports do not replace the complete production qualification campaign below.
+
+**Latest full qualification:** October 27, 2026 (UTC), application release
+[`cfc6419`](https://github.com/FlareRunnerOrg/flarerunner/commit/cfc6419bb76e1f14784efaa2fb2d42be7ab81989),
+20 passing verdicts across 53 managed jobs. Its operator-verified runner image is
+`sha256:c54213ec9d8e97c5878e85470c356be90451b4bb241647243d5419562f57da2a`.
+The [qualification record](QUALIFICATION.md) binds the release, image and date;
+it is historical evidence, not a claim that every later release was requalified.
+
 ## What a passing test means
 
-**Security verdict** is the security test to read. It succeeds only after checking
+**Security verdict** checks one underlying workflow. **Security acceptance** combines
+all required workflows for the same trigger and revision. Both check
 GitHub’s job metadata and logs for every required probe. A rejected attack must:
 
 - run on an assigned FlareRunner instance;
@@ -15,12 +40,16 @@ GitHub’s job metadata and logs for every required probe. A rejected attack mus
 
 An attack that runs, an unrelated failure, a missing probe, a timeout, or a
 cancellation fails verification. Customer output cannot impersonate the platform
-step. The underlying **Reject …** workflows intentionally show `Failure` when the
-runner rejects their jobs; their corresponding **Security verdict** should be green.
+step. Jobs labelled **Attack probe — expected rejection** intentionally show
+`Failure` when the runner rejects them. The acceptance report shows whether that
+rejection passed its security assertion. Raw jobs and historical failures stay
+available as evidence.
 
 The verifier runs on GitHub-hosted infrastructure with read-only permissions. It
 checks out the protected branch’s verifier revision, never the triggering PR’s
-code, and never downloads or executes its artifacts. This follows GitHub’s
+code, and never downloads or executes its artifacts. The aggregate publisher also
+uses trusted protected-branch code and has only the additional `checks: write`
+permission needed to attach its report to the tested commit. This follows GitHub’s
 [guidance on privileged workflow triggers](https://docs.github.com/en/actions/reference/security/secure-use).
 
 ## What we exercise
@@ -59,6 +88,8 @@ Configure these Actions variables:
 The `security-canary` environment holds `FR_SECURITY_CANARY`, a generated value
 beginning with `fr-public-canary-`. It grants no authority anywhere. Never substitute
 real cloud, platform, payment, deployment, or customer credentials.
+Its jobs use `deployment: false`: they still receive the environment's dummy
+secret without creating misleading deployment records. Older records are preserved.
 
 1. Run `bun test` to check the verifier’s false-positive regressions.
 2. Dispatch **Public runner security** on `main` to seed trusted cache data.
@@ -79,6 +110,11 @@ real cloud, platform, payment, deployment, or customer credentials.
 
 Each completed main/PR control and rejection workflow starts a **Security verdict**
 automatically. Cancellation uses the manual verdict described above.
+**Fixture checks** completion starts **Security acceptance**, which waits up to
+twenty minutes for the required cohort. It binds the completion rejection to its
+exact baseline run, rejects ambiguous executions, and rechecks run attempts before
+publishing. A manual acceptance dispatch takes a **Fixture checks** run ID for a
+main push or PR; individual manual attack and cancellation runs still use Security verdict.
 You can also dispatch that workflow with a run ID, or inspect it locally with
 `bun run verify <run-id> auto`. The CLI requires an authorized `gh` session.
 Verification binds the job listing to the recorded run attempt and rejects partial
