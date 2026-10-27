@@ -4,6 +4,21 @@ Controlled integration fixtures for FlareRunner-owned public GitHub Actions jobs
 These tests use dummy canaries and disposable branches. They do not probe customer
 repositories, retrieve cloud metadata credentials, exploit kernels, or generate abusive traffic.
 
+## Reading the results
+
+The workflows named **Reject …** deliberately finish with GitHub’s `Failure`
+status when FlareRunner blocks a job before its customer steps. That is the
+expected outcome for those negative tests, but a red run alone proves nothing:
+verify the assigned runner, the absence of customer execution, and the intended
+policy rejection in operator telemetry.
+
+**Public runner security** is the positive control and must succeed. A failure,
+skip, cancellation or timeout in that workflow leaves qualification incomplete.
+Keep initial failures visible alongside any later retries.
+
+See the [acceptance record](QUALIFICATION.md) for deployed results and the failures
+that led to regression tests.
+
 ## Boundaries exercised
 
 | Case | Required result |
