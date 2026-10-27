@@ -9,7 +9,7 @@ interface VerdictTriggers {
 }
 interface AttackJob {
 	permissions?: { [scope: string]: string };
-	environment?: string;
+	environment?: { name: string; deployment: boolean };
 	env?: { SECURITY_CANARY?: string };
 	container?: { image: string; env: { SECURITY_CANARY: string } };
 	services?: { untrusted: { image: string; env: { SECURITY_CANARY: string } } };
@@ -105,7 +105,10 @@ test("every automatic attack/control workflow starts a trusted security verdict"
 test("credential probes retain distinct secret, write-token and OIDC attack inputs", async () => {
 	const workflow = await attackWorkflow("deny-untrusted.yml");
 	expect(workflow.permissions).toEqual({ contents: "read" });
-	expect(workflow.jobs["project-secret"].environment).toBe("security-canary");
+	expect(workflow.jobs["project-secret"].environment).toEqual({
+		name: "security-canary",
+		deployment: false,
+	});
 	expect(workflow.jobs["project-secret"].env).toEqual({
 		SECURITY_CANARY: "${{ secrets.FR_SECURITY_CANARY }}",
 	});
@@ -123,7 +126,10 @@ test("escalation probes cannot substitute a different permission or remove a con
 	const jobs = workflow.jobs;
 	expect(workflow.permissions).toEqual({ contents: "read" });
 	expect(jobs["empty-token-secret"].permissions).toEqual({});
-	expect(jobs["empty-token-secret"].environment).toBe("security-canary");
+	expect(jobs["empty-token-secret"].environment).toEqual({
+		name: "security-canary",
+		deployment: false,
+	});
 	expect(jobs["empty-token-secret"].env).toEqual({
 		SECURITY_CANARY: "${{ secrets.FR_SECURITY_CANARY }}",
 	});
@@ -139,7 +145,10 @@ test("escalation probes cannot substitute a different permission or remove a con
 		contents: "write",
 	});
 	for (const name of ["job-container-secret", "service-container-secret"]) {
-		expect(jobs[name].environment).toBe("security-canary");
+		expect(jobs[name].environment).toEqual({
+			name: "security-canary",
+			deployment: false,
+		});
 		const container =
 			name === "job-container-secret"
 				? jobs[name].container

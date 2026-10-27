@@ -68,7 +68,9 @@ jobs:
         run: bun run probe guest-root
   mask:
     if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-    environment: security-canary
+    environment:
+      name: security-canary
+      deployment: false
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
