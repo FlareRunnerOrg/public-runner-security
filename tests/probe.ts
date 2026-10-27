@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { assertNoPlatformCredentials } from "../scripts/credential-boundary.ts";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 
 const repository = "FlareRunnerOrg/public-runner-security";
@@ -6,8 +7,10 @@ const sentinels = [
 	"/tmp/fr-security-persistence-canary",
 	"/home/runner/.fr-security-persistence-canary",
 ];
+const rootSentinel = "/root/.fr-security-persistence-canary";
 const mode = Bun.argv[2];
 async function guestRoot(): Promise<void> {
+	await assertFreshFilesystem();
 	const script = `set -euo pipefail
  test "$(sudo -n id -u)" = 0
  sudo -n bash -c '
@@ -54,6 +57,23 @@ async function assertFreshFilesystem(): Promise<void> {
 		);
 		assert.equal(present, false, "A previous job's fixture file survived");
 	}
+	const child = Bun.spawn(
+		[
+			"sudo",
+			"-n",
+			"sh",
+			"-c",
+			'test ! -e "$1" && test ! -L "$1"',
+			"root-persistence",
+			rootSentinel,
+		],
+		{ stdin: "ignore", stdout: "ignore", stderr: "inherit", timeout: 10_000 },
+	);
+	assert.equal(
+		await child.exited,
+		0,
+		"A previous job left a root-owned file or symlink",
+	);
 }
 
 async function request(url: string, init: RequestInit = {}): Promise<Response> {
@@ -67,26 +87,7 @@ async function request(url: string, init: RequestInit = {}): Promise<Response> {
 async function baseline(): Promise<void> {
 	assert.equal(required("GITHUB_REPOSITORY"), repository);
 	await assertFreshFilesystem();
-	for (const name of [
-		"CLOUDFLARE_API_TOKEN",
-		"GITHUB_APP_PRIVATE_KEY_PKCS8_BASE64",
-		"GITHUB_APP_CLIENT_SECRET",
-		"GITHUB_WEBHOOK_SECRET",
-		"WORKSPACE_CONTROL_TOKEN",
-		"RUNNER_OPERATIONS_TOKEN",
-		"PRODUCTION_RELAY_TOKEN",
-		"WORKLOAD_TOKEN",
-		"FLARERUNNER_WORKLOAD_TOKEN",
-		"STRIPE_TEST_RESTRICTED_API_KEY",
-		"STRIPE_LIVE_RESTRICTED_API_KEY",
-		"SECURITY_CANARY",
-	]) {
-		assert.equal(
-			process.env[name],
-			undefined,
-			`Platform credential entered the job environment: ${name}`,
-		);
-	}
+	assertNoPlatformCredentials(process.env);
 	const privateProduct = await request("https://flarerunner.com/v1/product");
 	assert.equal(
 		privateProduct.status,
@@ -164,6 +165,17 @@ async function baseline(): Promise<void> {
 		await writeFile(".security-cache/provenance.txt", expected);
 	}
 	for (const path of sentinels) await writeFile(path, `${runId}:${attempt}`);
+	const child = Bun.spawn(["sudo", "-n", "tee", rootSentinel], {
+		stdin: new Blob([`${runId}:${attempt}`]),
+		stdout: "ignore",
+		stderr: "inherit",
+		timeout: 10_000,
+	});
+	assert.equal(
+		await child.exited,
+		0,
+		"Could not create the root persistence canary",
+	);
 	console.log(`FR_SECURITY_CACHE ${JSON.stringify({ hit, scope: expected })}`);
 	console.log("FR_SECURITY_BASELINE_PASS");
 }
