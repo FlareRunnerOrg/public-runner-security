@@ -9,7 +9,7 @@ export interface WorkflowJob {
 	status: string;
 	conclusion: string | null;
 	runner_name: string | null;
-	steps: JobStep[];
+	steps: readonly JobStep[];
 	html_url: string;
 }
 
@@ -35,7 +35,7 @@ export function assertJobCoverage(
 }
 
 export function assertManaged(job: WorkflowJob): void {
-	if (!job.runner_name?.startsWith("flarerunner-"))
+	if (!/^flarerunner-[a-f0-9]{40}$/.test(job.runner_name ?? ""))
 		throw new Error(`No managed-runner assignment: ${job.name}`);
 }
 
@@ -47,7 +47,11 @@ function assertAdmissionStep(job: WorkflowJob, conclusion: string): void {
 		throw new Error(`Unexpected platform admission result: ${job.name}`);
 }
 
-export function assertDenied(job: WorkflowJob, log: string): void {
+export function assertDenied(
+	job: WorkflowJob,
+	log: string,
+	reason: string,
+): void {
 	assertManaged(job);
 	if (job.status !== "completed")
 		throw new Error(`Job is not terminal: ${job.name}`);
@@ -60,6 +64,11 @@ export function assertDenied(job: WorkflowJob, log: string): void {
 		throw new Error(`Missing authoritative admission denial: ${job.name}`);
 	if (log.includes("FR_SECURITY_BOUNDARY_BREACH"))
 		throw new Error(`Customer steps executed in a denied job: ${job.name}`);
+	const reasons = [
+		...log.matchAll(/FR_ADMISSION_DENIED reason=([a-z_]+)\b/g),
+	].map((match) => match[1]);
+	if (reasons.length !== 1 || reasons[0] !== reason)
+		throw new Error(`Missing or incorrect policy denial: ${job.name}`);
 	const probe = job.steps.find((step) => step.name === "Must never execute");
 	if (probe && probe.conclusion !== "skipped")
 		throw new Error(`Denied job initialized the probe step: ${job.name}`);
@@ -71,6 +80,8 @@ export function assertPassed(
 	marker: string,
 ): void {
 	assertManaged(job);
+	if (job.status !== "completed")
+		throw new Error(`Positive control is not terminal: ${job.name}`);
 	assertAdmissionStep(job, "success");
 	if (job.conclusion !== "success")
 		throw new Error(`Positive control failed: ${job.name}`);

@@ -7,6 +7,38 @@ const sentinels = [
 	"/home/runner/.fr-security-persistence-canary",
 ];
 const mode = Bun.argv[2];
+async function guestRoot(): Promise<void> {
+	const script = `set -euo pipefail
+ test "$(sudo -n id -u)" = 0
+ sudo -n bash -c '
+ for file in /proc/[0-9]*/environ; do
+ if grep -azqE "^(FLARERUNNER_WORKLOAD_TOKEN|WORKLOAD_TOKEN|RUNNER_OPERATIONS_TOKEN|CLOUDFLARE_API_TOKEN|GITHUB_APP_PRIVATE_KEY_PKCS8_BASE64)=" "$file" 2>/dev/null; then
+ echo "Platform authority found in a guest process" >&2
+ exit 1
+ fi
+ done
+ '
+ for route in /internal/v1/runner-instances /internal/v1/runner-instances/rni_0000000000000000000000000000000000000000/terminate; do
+ status=$(sudo -n curl --noproxy '*' --silent --show-error --connect-timeout 5 --max-time 10 \
+ --output /dev/null --write-out '%{http_code}' --request POST \
+ --header 'content-type: application/json' --data '{}' \
+ "http://flarerunner-control.internal$route")
+ test "$status" = 403
+ done
+ `;
+	const child = Bun.spawn(["bash", "-c", script], {
+		stdin: "ignore",
+		stdout: "inherit",
+		stderr: "inherit",
+		timeout: 30_000,
+	});
+	assert.equal(
+		await child.exited,
+		0,
+		"Guest root crossed the platform authority boundary",
+	);
+	console.log("FR_SECURITY_GUEST_ROOT_PASS");
+}
 
 function required(name: string): string {
 	const value = process.env[name];
@@ -62,6 +94,14 @@ async function baseline(): Promise<void> {
 		"The product API allowed an unauthenticated request",
 	);
 
+	const tokenProduct = await request("https://flarerunner.com/v1/product", {
+		headers: { authorization: `Bearer ${required("GH_JOB_TOKEN")}` },
+	});
+	assert.equal(
+		tokenProduct.status,
+		401,
+		"A GitHub job token authenticated to the private product API",
+	);
 	const runId = required("GITHUB_RUN_ID");
 	const attempt = required("GITHUB_RUN_ATTEMPT");
 	assert.match(runId, /^\d+$/);
@@ -139,7 +179,8 @@ async function mask(): Promise<void> {
 	console.log("FR_SECURITY_MASK_PASS");
 }
 
-if (mode === "baseline") await baseline();
+if (mode === "guest-root") await guestRoot();
+else if (mode === "baseline") await baseline();
 else if (mode === "isolation") {
 	await assertFreshFilesystem();
 	console.log("FR_SECURITY_ISOLATION_PASS");
