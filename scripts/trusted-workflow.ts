@@ -126,7 +126,10 @@ export function assertTrustedPublisher(workflow: PublisherWorkflow): void {
 		"timeout-minutes",
 	]);
 	// Do not gate the publisher on the opt-in: disabled testing must be reported, not silently skipped.
-	assert.equal(job.if, "${{ github.ref == 'refs/heads/main' }}");
+	assert.equal(
+		job.if,
+		"${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.event == 'pull_request' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')) }}",
+	);
 	assert.equal(job["runs-on"], "ubuntu-24.04");
 	assert.equal(job["timeout-minutes"], 25);
 	assert.equal(job.steps.length, 3);

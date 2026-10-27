@@ -16,7 +16,7 @@ permissions:
   checks: write
 jobs:
   acceptance:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.event == 'pull_request' || (github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
