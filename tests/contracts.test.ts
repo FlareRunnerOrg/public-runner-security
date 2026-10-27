@@ -15,6 +15,21 @@ const run: FixtureRun = {
 	repository: { full_name: "FlareRunnerOrg/public-runner-security" },
 };
 describe("trusted verifier contract", () => {
+	test("custom display names cannot change the registered workflow contract", () => {
+		expect(
+			contractFor({
+				...run,
+				name: "Attack probes — expected rejections: containers and tokens / branch",
+			}),
+		).toEqual(contractFor(run));
+		expect(() =>
+			contractFor({
+				...run,
+				name: run.name,
+				path: ".github/workflows/unregistered.yml",
+			}),
+		).toThrow();
+	});
 	test("requires all six escalation probes and their intended policy", () => {
 		const c = contractFor(run);
 		expect(c.expected).toHaveLength(6);
@@ -34,7 +49,6 @@ describe("trusted verifier contract", () => {
 		{ conclusion: "cancelled" },
 		{ conclusion: "timed_out" },
 		{ path: ".github/workflows/attacker.yml" },
-		{ name: "Security verdict" },
 		{ event: "workflow_run" },
 		{ head_sha: "bad" },
 		{ run_attempt: 0 },

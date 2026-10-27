@@ -8,6 +8,7 @@ permissions:
   contents: read
 jobs:
   workflow-run:
+    name: "Attack probe — expected rejection: workflow-run"
     if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}

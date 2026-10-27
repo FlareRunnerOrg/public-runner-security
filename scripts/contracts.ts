@@ -44,8 +44,8 @@ export function contractFor(run: FixtureRun): Contract {
 	assert.match(run.head_sha, /^[a-f0-9]{40}$/);
 	let file: string;
 	let contract: Contract;
-	switch (run.name) {
-		case "Public runner security":
+	switch (run.path) {
+		case ".github/workflows/public-security.yml":
 			file = "public-security.yml";
 			assert(["push", "pull_request", "workflow_dispatch"].includes(run.event));
 			if (run.event !== "pull_request") assert.equal(run.head_branch, "main");
@@ -62,7 +62,7 @@ export function contractFor(run: FixtureRun): Contract {
 				"Positive control did not succeed",
 			);
 			break;
-		case "Reject credential-bearing untrusted jobs":
+		case ".github/workflows/deny-untrusted.yml":
 			file = "deny-untrusted.yml";
 			contract = {
 				kind: "denied",
@@ -75,7 +75,7 @@ export function contractFor(run: FixtureRun): Contract {
 				},
 			};
 			break;
-		case "Reject container and token escalation":
+		case ".github/workflows/deny-escalation.yml":
 			file = "deny-escalation.yml";
 			contract = {
 				kind: "denied",
@@ -98,7 +98,7 @@ export function contractFor(run: FixtureRun): Contract {
 				},
 			};
 			break;
-		case "Reject privileged PR trigger":
+		case ".github/workflows/deny-privileged.yml":
 			file = "deny-privileged.yml";
 			assert.equal(run.event, "pull_request_target");
 			contract = {
@@ -108,7 +108,7 @@ export function contractFor(run: FixtureRun): Contract {
 				reasons: { "pull-request-target": "privileged_event" },
 			};
 			break;
-		case "Reject privileged workflow completion trigger":
+		case ".github/workflows/deny-workflow-run.yml":
 			file = "deny-workflow-run.yml";
 			assert.equal(run.event, "workflow_run");
 			contract = {
@@ -118,7 +118,7 @@ export function contractFor(run: FixtureRun): Contract {
 				reasons: { "workflow-run": "privileged_event" },
 			};
 			break;
-		case "Runner cancellation":
+		case ".github/workflows/lifetime.yml":
 			file = "lifetime.yml";
 			assert.equal(run.event, "workflow_dispatch");
 			contract = {

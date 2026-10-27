@@ -82,6 +82,7 @@ function fixture(source = anchor) {
 		head_branch: "main",
 		head_sha: "b".repeat(40),
 		display_title: completionTitle(baseline.id),
+		name: completionTitle(baseline.id),
 	};
 	const logs = new Map<number, string>();
 	const jobs = new Map<number, WorkflowJob[]>();

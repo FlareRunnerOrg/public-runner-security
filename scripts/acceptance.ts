@@ -29,7 +29,6 @@ const cohortWindowMs = 90_000;
 export function assertAnchor(run: AcceptanceRun): void {
 	assert.equal(run.repository.full_name, repository);
 	assert.equal(run.path, fixturePath, "Anchor must be Fixture checks");
-	assert.equal(run.name, "Fixture checks");
 	assert(
 		["push", "pull_request"].includes(run.event),
 		"Anchor must be a push or PR",
