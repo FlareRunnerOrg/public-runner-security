@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { assertNoPlatformCredentials } from "../scripts/credential-boundary.ts";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 
 const repository = "FlareRunnerOrg/public-runner-security";
@@ -67,26 +68,7 @@ async function request(url: string, init: RequestInit = {}): Promise<Response> {
 async function baseline(): Promise<void> {
 	assert.equal(required("GITHUB_REPOSITORY"), repository);
 	await assertFreshFilesystem();
-	for (const name of [
-		"CLOUDFLARE_API_TOKEN",
-		"GITHUB_APP_PRIVATE_KEY_PKCS8_BASE64",
-		"GITHUB_APP_CLIENT_SECRET",
-		"GITHUB_WEBHOOK_SECRET",
-		"WORKSPACE_CONTROL_TOKEN",
-		"RUNNER_OPERATIONS_TOKEN",
-		"PRODUCTION_RELAY_TOKEN",
-		"WORKLOAD_TOKEN",
-		"FLARERUNNER_WORKLOAD_TOKEN",
-		"STRIPE_TEST_RESTRICTED_API_KEY",
-		"STRIPE_LIVE_RESTRICTED_API_KEY",
-		"SECURITY_CANARY",
-	]) {
-		assert.equal(
-			process.env[name],
-			undefined,
-			`Platform credential entered the job environment: ${name}`,
-		);
-	}
+	assertNoPlatformCredentials(process.env);
 	const privateProduct = await request("https://flarerunner.com/v1/product");
 	assert.equal(
 		privateProduct.status,
