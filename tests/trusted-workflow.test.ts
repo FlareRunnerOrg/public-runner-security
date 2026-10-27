@@ -31,6 +31,11 @@ test("write permissions cannot be added to the verifier", () => {
 	workflow.permissions.actions = "write";
 	expect(() => assertTrustedVerifier(workflow)).toThrow();
 });
+test("verification failures cannot be made non-fatal", () => {
+	const workflow = fixture();
+	Object.assign(workflow.jobs.verify, { "continue-on-error": true });
+	expect(() => assertTrustedVerifier(workflow)).toThrow();
+});
 test("artifact execution cannot be added to the verifier", () => {
 	const workflow = fixture();
 	workflow.jobs.verify.steps.push({

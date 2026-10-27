@@ -30,6 +30,9 @@ describe("deployed denial evidence", () => {
 			assertDenied(assigned, denial, "untrusted_secrets"),
 		).not.toThrow());
 	test.each([
+		{ ...assigned, conclusion: "success" },
+		{ ...assigned, conclusion: "skipped" },
+		{ ...assigned, conclusion: "timed_out" },
 		{ ...assigned, conclusion: "cancelled" },
 		{ ...assigned, runner_name: null },
 		{ ...assigned, runner_name: "GitHub Actions" },

@@ -44,7 +44,8 @@ describe("trusted verifier contract", () => {
 	});
 	test.each([
 		{ status: "queued" },
-		{ conclusion: "success" },
+		{ conclusion: "neutral" },
+		{ conclusion: null },
 		{ conclusion: "skipped" },
 		{ conclusion: "cancelled" },
 		{ conclusion: "timed_out" },
@@ -61,6 +62,11 @@ describe("trusted verifier contract", () => {
 			expect(() => contractFor({ ...run, ...change })).toThrow();
 		},
 	);
+	test("a successful workflow wrapper still selects the full denial contract", () => {
+		expect(contractFor({ ...run, conclusion: "success" })).toEqual(
+			contractFor(run),
+		);
+	});
 	test("requires every positive control; only PR masking is intentionally skipped", () => {
 		const baseline = {
 			...run,
