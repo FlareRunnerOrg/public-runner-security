@@ -11,9 +11,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   baseline:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' }}
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on:
-      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      group: flarerunner-frg-07f27f39f72bfbc1
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 5
     steps:
@@ -28,7 +28,7 @@ jobs:
         id: cache
         with:
           path: .security-cache
-          key: public-security-${{ vars.FR_SECURITY_CACHE_EPOCH }}
+          key: public-security-bounded-cfc6419-20261027
       - name: Exercise credential, cache, privacy and Internet boundaries
         run: bun run probe baseline
         env:
@@ -37,7 +37,7 @@ jobs:
   isolation:
     needs: baseline
     runs-on:
-      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      group: flarerunner-frg-07f27f39f72bfbc1
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 5
     steps:
@@ -53,7 +53,7 @@ jobs:
   guest-root:
     needs: isolation
     runs-on:
-      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      group: flarerunner-frg-07f27f39f72bfbc1
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 3
     steps:
@@ -70,7 +70,7 @@ jobs:
     if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     environment: security-canary
     runs-on:
-      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      group: flarerunner-frg-07f27f39f72bfbc1
       labels: [self-hosted, flarerunner-1x]
     timeout-minutes: 5
     steps:
