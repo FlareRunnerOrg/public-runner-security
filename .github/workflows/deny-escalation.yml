@@ -1,0 +1,87 @@
+name: Reject container and token escalation
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  empty-token-secret:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    permissions: {}
+    environment: security-canary
+    env:
+      SECURITY_CANARY: ${{ secrets.FR_SECURITY_CANARY }}
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
+  artifact-read:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
+  checks-write:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    permissions:
+      checks: write
+      contents: read
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
+  job-container-secret:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    environment: security-canary
+    container:
+      image: ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+      env:
+        SECURITY_CANARY: ${{ secrets.FR_SECURITY_CANARY }}
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
+  service-container-secret:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    environment: security-canary
+    services:
+      untrusted:
+        image: ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+        env:
+          SECURITY_CANARY: ${{ secrets.FR_SECURITY_CANARY }}
+    steps:
+      - name: Must never execute
+        run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
+  docker-action-write-token:
+    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    runs-on:
+      group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
+      labels: [self-hosted, flarerunner-1x]
+    timeout-minutes: 3
+    permissions:
+      contents: write
+    steps:
+      - name: Must never execute
+        uses: docker://ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+        with:
+          entrypoint: /bin/sh
+          args: -c 'echo FR_SECURITY_BOUNDARY_BREACH; exit 1'

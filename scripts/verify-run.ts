@@ -1,3 +1,5 @@
+import { appendFile } from "node:fs/promises";
+import { contractFor, repository, type FixtureRun } from "./contracts.ts";
 import {
 	assertDenied,
 	assertJobCoverage,
@@ -5,11 +7,12 @@ import {
 	type WorkflowJob,
 } from "./outcome.ts";
 
-const repository = "FlareRunnerOrg/public-runner-security";
 const [runId, kind] = Bun.argv.slice(2);
 if (!runId || !/^\d+$/.test(runId))
-	throw new Error("Usage: bun run verify <run-id> <baseline|denied|cancelled>");
-if (!["baseline", "denied", "cancelled"].includes(kind))
+	throw new Error(
+		"Usage: bun run verify <run-id> <auto|baseline|denied|cancelled>",
+	);
+if (!["auto", "baseline", "denied", "cancelled"].includes(kind))
 	throw new Error("An explicit expected outcome is required");
 
 async function gh(args: string[]): Promise<string> {
@@ -31,46 +34,26 @@ async function gh(args: string[]): Promise<string> {
 	return stdout;
 }
 
-const run: {
-	status: string;
-	conclusion: string | null;
-	html_url: string;
-	head_sha: string;
-	event: string;
-	name: string;
-} = JSON.parse(await gh(["api", `repos/${repository}/actions/runs/${runId}`]));
-if (run.status !== "completed")
-	throw new Error("Evidence is not terminal; inspect the run and retry later");
-const data: { jobs: WorkflowJob[] } = JSON.parse(
+const run: FixtureRun = JSON.parse(
+	await gh(["api", `repos/${repository}/actions/runs/${runId}`]),
+);
+if (String(run.id) !== runId) throw new Error("Run identity changed");
+const contract = contractFor(run);
+if (kind !== "auto" && kind !== contract.kind)
+	throw new Error("Workflow does not match the expected evidence kind");
+const data: { jobs: WorkflowJob[]; total_count: number } = JSON.parse(
 	await gh([
 		"api",
-		`repos/${repository}/actions/runs/${runId}/jobs?filter=latest&per_page=100`,
+		`repos/${repository}/actions/runs/${runId}/attempts/${run.run_attempt}/jobs?per_page=100`,
 	]),
 );
-let expected: string[];
-let allowedSkipped: string[] = [];
-if (kind === "baseline" && run.name === "Public runner security") {
-	expected = ["baseline", "isolation"];
-	if (run.event === "pull_request") allowedSkipped = ["mask"];
-	else expected.push("mask");
-} else if (kind === "cancelled" && run.name === "Runner cancellation") {
-	expected = ["lifetime"];
-} else if (kind === "denied") {
-	switch (run.name) {
-		case "Reject credential-bearing untrusted jobs":
-			expected = ["project-secret", "write-token", "oidc"];
-			break;
-		case "Reject privileged PR trigger":
-			expected = ["pull-request-target"];
-			break;
-		case "Reject privileged workflow completion trigger":
-			expected = ["workflow-run"];
-			break;
-		default:
-			throw new Error("Unexpected denial workflow");
-	}
-} else throw new Error("Workflow does not match the expected evidence kind");
-const jobs = assertJobCoverage(data.jobs, expected, allowedSkipped);
+if (data.total_count !== data.jobs.length)
+	throw new Error("Incomplete job listing");
+const jobs = assertJobCoverage(
+	data.jobs,
+	contract.expected,
+	contract.allowedSkipped,
+);
 for (const job of jobs) {
 	const log = await gh([
 		"run",
@@ -84,11 +67,12 @@ for (const job of jobs) {
 	]);
 	if (log.includes("fr-public-canary-"))
 		throw new Error("An unmasked dummy canary appeared in GitHub logs");
-	if (kind === "denied") assertDenied(job, log);
-	else if (kind === "cancelled") {
+	if (contract.kind === "denied")
+		assertDenied(job, log, contract.reasons[job.name]);
+	else if (contract.kind === "cancelled") {
 		if (job.conclusion !== "cancelled")
 			throw new Error("Cancellation has not reached the assigned job");
-		if (!job.runner_name?.startsWith("flarerunner-"))
+		if (!/^flarerunner-[a-f0-9]{40}$/.test(job.runner_name ?? ""))
 			throw new Error("Cancellation did not exercise a managed runner");
 		if (!log.includes("FR_SECURITY_LIFETIME_STARTED"))
 			throw new Error("The workload had not started before cancellation");
@@ -110,16 +94,32 @@ console.log(
 			run: run.html_url,
 			head_sha: run.head_sha,
 			event: run.event,
-			expected: kind,
+			expected: contract.kind,
+			attempt: run.run_attempt,
 			result: "passed",
 			jobs: jobs.map(({ id, name, conclusion, runner_name }) => ({
 				id,
 				name,
 				conclusion,
 				runner_name,
+				reason: contract.reasons[name] ?? null,
 			})),
 		},
 		null,
 		2,
 	),
 );
+
+console.log(`FR_SECURITY_VERDICT_PASS run=${runId} attempt=${run.run_attempt}`);
+if (process.env.GITHUB_STEP_SUMMARY)
+	await appendFile(
+		process.env.GITHUB_STEP_SUMMARY,
+		`## Security test passed\n\n[Fixture run #${runId}](https://github.com/${repository}/actions/runs/${runId}/attempts/${run.run_attempt})\n\n` +
+			jobs
+				.map(
+					(job) =>
+						`- ${job.name}: ${contract.reasons[job.name] ?? "positive control passed"}`,
+				)
+				.join("\n") +
+			"\n",
+	);

@@ -1,89 +1,88 @@
-# Public runner security qualification
+# Public runner security tests
 
-Controlled integration fixtures for FlareRunner-owned public GitHub Actions jobs.
-These tests use dummy canaries and disposable branches. They do not probe customer
-repositories, retrieve cloud metadata credentials, exploit kernels, or generate abusive traffic.
+This is FlareRunner’s public acceptance suite. It runs controlled attack fixtures
+against our production runners using a dummy secret and disposable branches.
 
-## Reading the results
+## What a passing test means
 
-The workflows named **Reject …** deliberately finish with GitHub’s `Failure`
-status when FlareRunner blocks a job before its customer steps. That is the
-expected outcome for those negative tests, but a red run alone proves nothing:
-verify the assigned runner, the absence of customer execution, and the intended
-policy rejection in operator telemetry.
+**Security verdict** is the security test to read. It succeeds only after checking
+GitHub’s job metadata and logs for every required probe. A rejected attack must:
 
-**Public runner security** is the positive control and must succeed. A failure,
-skip, cancellation or timeout in that workflow leaves qualification incomplete.
-Keep initial failures visible alongside any later retries.
+- run on an assigned FlareRunner instance;
+- fail in the platform’s first **FlareRunner admission** step;
+- report the specific policy that blocked it;
+- leave all customer steps, action setup, and container initialization unstarted.
 
-See the [acceptance record](QUALIFICATION.md) for deployed results and the failures
-that led to regression tests.
+An attack that runs, an unrelated failure, a missing probe, a timeout, or a
+cancellation fails verification. Customer output cannot impersonate the platform
+step. The underlying **Reject …** workflows intentionally show `Failure` when the
+runner rejects their jobs; their corresponding **Security verdict** should be green.
 
-## Boundaries exercised
+The verifier runs on GitHub-hosted infrastructure with read-only permissions. It
+checks out the protected branch’s verifier revision, never the triggering PR’s
+code, and never downloads or executes its artifacts. This follows GitHub’s
+[guidance on privileged workflow triggers](https://docs.github.com/en/actions/reference/security/secure-use).
 
-| Case | Required result |
+## What we exercise
+
+| Attack or control | Required result |
 | --- | --- |
-| Public default-branch job | Normal HTTPS access and successful read-only CI |
-| Read-only GitHub job token | Creating a disposable fixture branch is denied |
-| Platform credentials | Known platform credential variables are absent from job environment |
-| Same-repository and fork PRs | Secretless positive controls run on managed runners |
-| Project secret, write token, OIDC in an untrusted job | Runner denies admission before any customer step |
-| `pull_request_target` and `workflow_run` | Runner denies privileged triggers before customer code |
-| PR cache poisoning | Main restores trusted data; PRs restore only their own scope, including across separate PRs |
-| Disk persistence | Files written by a previous job are absent in the next job |
-| Dummy secret masking | Trusted work can use a generated fixture canary; logs redact its value |
-| Cancellation | An executing managed workload receives cancellation and its runner registration disappears |
-| Product privacy | An unauthenticated product request receives 401 |
+| Public main, same-repository PR, and owned-fork PR | Secretless CI succeeds with normal HTTPS access |
+| Repository write with the job token | GitHub returns 403 |
+| Project secret in an untrusted job | `untrusted_secrets`, before customer code |
+| Secret with `permissions: {}` | Still `untrusted_secrets`; token scopes do not remove delivered secrets |
+| Contents-write, checks-write, or Actions-read token | `untrusted_token_permissions` |
+| OIDC request in an untrusted job | `untrusted_oidc` |
+| Secret in a job container or service container | `untrusted_secrets`, before image or container setup |
+| Docker action with a write token | `untrusted_token_permissions`, before action setup |
+| `pull_request_target` or `workflow_run` | `privileged_event`, before customer code |
+| PR cache poisoning | Main restores trusted data; each PR has its own cache scope |
+| Files left by a previous job | Absent in the next job |
+| Dummy secret used by trusted main | Usable by the job and masked in its logs |
+| Cancellation | Started workload stops and its runner registration disappears |
 
-## Controlled setup
+See the [qualification record](QUALIFICATION.md) for production evidence and the
+failures that led to regression tests. Preserve failed attempts alongside fixes.
 
-The repository must be selected on the production FlareRunner App installation.
-Account approval and existing workspace funding remain required. Keep
-`FR_SECURITY_TEST_ENABLED` unset until the intended production release is verified.
+## Configuration and execution
 
-Set these repository Actions variables:
+Select this repository on the FlareRunner App installation and fund its workspace.
+Configure these Actions variables:
 
-- `FLARERUNNER_RUNNER_GROUP`: the verified workspace group from FlareRunner.
-- `FR_SECURITY_CACHE_EPOCH`: a fresh identifier for this qualification campaign.
-- `FR_SECURITY_CANARY_SHA256`: SHA-256 of the generated dummy canary.
-- `FR_SECURITY_TEST_ENABLED`: `true` only when ready to execute the bounded fixtures.
+- `FLARERUNNER_RUNNER_GROUP`: the workspace runner group.
+- `FR_SECURITY_CACHE_EPOCH`: a fresh campaign identifier.
+- `FR_SECURITY_CANARY_SHA256`: SHA-256 of the dummy canary.
+- `FR_SECURITY_TEST_ENABLED`: `true` to run the production fixtures on pushes and PRs.
 
-Create the fixture-only GitHub environment `security-canary` and set its environment
-secret `FR_SECURITY_CANARY` to a newly generated value beginning with
-`fr-public-canary-`. It has no authority outside these fixtures. Never use real
-platform, cloud, deployment, customer or payment credentials as a canary.
-The positive PR job does not request this environment. The negative secret job does,
-so its actual delivered credential is rejected before customer code. Keep real
-deployment secrets in reviewed environments rather than making them available to PR jobs.
+The `security-canary` environment holds `FR_SECURITY_CANARY`, a generated value
+beginning with `fr-public-canary-`. It grants no authority anywhere. Never substitute
+real cloud, platform, payment, deployment, or customer credentials.
 
-## Run the campaign
+1. Run `bun test` to check the verifier’s false-positive regressions.
+2. Dispatch **Public runner security** on `main` to seed trusted cache data.
+3. Open two harmless same-repository PRs. Each must pass the positive controls and
+   the security verdicts for credential, container/token, and privileged-trigger probes.
+4. Open a harmless PR from the owned fork to test secretless fork execution and
+   privileged-trigger rejection. Repository variables are withheld from fork jobs;
+   use literal, nonsecret runner routing in the disposable fixture branch.
+5. Dispatch the main control again. Its cache must hit and retain trusted provenance.
+6. Run **Runner cancellation**, cancel it after its final step starts, and verify
+   provider shutdown and runner deregistration.
+7. Close the disposable PRs and delete their branches. Merged branches are deleted automatically.
 
-1. Run `bun test` to verify that the evidence checker rejects false positives.
-2. Dispatch **Public runner security** on `main`; retain the trusted cache seed and dummy masking evidence.
-3. Open two same-repository PRs with harmless README edits. Verify the positive workflow on each and the expected admission failures in **Reject credential-bearing untrusted jobs** and **Reject privileged PR trigger**.
-4. Open a PR from a FlareRunner-owned fork. Verify the secretless positive workflow and privileged-trigger denial. A fork owned by an organization member exercises fork isolation, not the approval behavior of an unrelated outsider.
-5. Dispatch **Public runner security** again on `main`; the cache must hit and still contain trusted data.
-6. Dispatch **Runner cancellation**, wait until its last step is executing, cancel it, verify terminal cancellation, then verify the assigned runner disappears from the organization runner inventory.
-7. Check each completed run with `bun run verify <run-id> baseline`, `denied`, or `cancelled`. A queued, skipped, unassigned, unrelated failure or executed rejection probe is never a passing denial.
+Every completed attack/control run starts a **Security verdict** automatically.
+You can also dispatch that workflow with a run ID, or inspect it locally with
+`bun run verify <run-id> auto`. The CLI requires an authorized `gh` session.
+Verification binds the job listing to the recorded run attempt and rejects partial
+listings, unknown workflows, substituted paths, and the wrong repository.
 
-The GitHub CLI must be authenticated as the authorized FlareRunner account. All
-controller operations use `gh`. Retain exact run URLs, commit SHAs, job conclusions
-and runner names with the release evidence; never retain tokens or secret values.
+## Scope of the evidence
 
-## Limits of the evidence
+These tests use only FlareRunner-owned resources. They do not retrieve cloud
+metadata credentials, exploit kernels, access customer data, or generate abusive
+traffic. No suite proves the absence of every vulnerability.
 
-Passing fixtures establishes these specific deployed behaviors. GitHub runner
-admission failures can also result from funding, assignment or provider availability.
-The log checker verifies the platform step and absence of customer execution;
-corroborate each negative case's intended credential or event rejection with
-operator telemetry for that job. A generic admission failure alone does not prove
-the tested restriction. Preserve initial failures and retries separately, and do
-not infer successful concurrent scheduling from cases that passed after serial retries.
-
-GitHub runner
-deregistration does not itself prove Cloudflare VM destruction, and GitHub log
-masking does not by itself prove first-party retained-log masking. Those require
-separate provider and authenticated FlareRunner observations. These tests do not
-establish immunity from VM escapes, malicious outbound traffic, stolen cards or
-unknown vulnerabilities. They are regression evidence, not a security certification.
-Controlled integration tests for FlareRunner public GitHub Actions runner security boundaries
+GitHub log masking does not prove masking in FlareRunner’s retained logs; the
+qualification driver checks that separately. Runner deregistration does not prove
+physical disk erasure; provider shutdown is separate evidence. An owned fork tests
+fork isolation, not GitHub’s approval behavior for an unrelated first-time contributor.
