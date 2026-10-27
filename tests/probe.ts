@@ -7,8 +7,10 @@ const sentinels = [
 	"/tmp/fr-security-persistence-canary",
 	"/home/runner/.fr-security-persistence-canary",
 ];
+const rootSentinel = "/root/.fr-security-persistence-canary";
 const mode = Bun.argv[2];
 async function guestRoot(): Promise<void> {
+	await assertFreshFilesystem();
 	const script = `set -euo pipefail
  test "$(sudo -n id -u)" = 0
  sudo -n bash -c '
@@ -55,6 +57,23 @@ async function assertFreshFilesystem(): Promise<void> {
 		);
 		assert.equal(present, false, "A previous job's fixture file survived");
 	}
+	const child = Bun.spawn(
+		[
+			"sudo",
+			"-n",
+			"sh",
+			"-c",
+			'test ! -e "$1" && test ! -L "$1"',
+			"root-persistence",
+			rootSentinel,
+		],
+		{ stdin: "ignore", stdout: "ignore", stderr: "inherit", timeout: 10_000 },
+	);
+	assert.equal(
+		await child.exited,
+		0,
+		"A previous job left a root-owned file or symlink",
+	);
 }
 
 async function request(url: string, init: RequestInit = {}): Promise<Response> {
@@ -146,6 +165,17 @@ async function baseline(): Promise<void> {
 		await writeFile(".security-cache/provenance.txt", expected);
 	}
 	for (const path of sentinels) await writeFile(path, `${runId}:${attempt}`);
+	const child = Bun.spawn(["sudo", "-n", "tee", rootSentinel], {
+		stdin: new Blob([`${runId}:${attempt}`]),
+		stdout: "ignore",
+		stderr: "inherit",
+		timeout: 10_000,
+	});
+	assert.equal(
+		await child.exited,
+		0,
+		"Could not create the root persistence canary",
+	);
 	console.log(`FR_SECURITY_CACHE ${JSON.stringify({ hit, scope: expected })}`);
 	console.log("FR_SECURITY_BASELINE_PASS");
 }
