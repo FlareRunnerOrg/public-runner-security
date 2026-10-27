@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   empty-token-secret:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
@@ -19,7 +19,8 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   artifact-read:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    needs: empty-token-secret
+    if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
@@ -31,7 +32,8 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   checks-write:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    needs: artifact-read
+    if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
@@ -43,7 +45,8 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   job-container-secret:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    needs: checks-write
+    if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
@@ -57,7 +60,8 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   service-container-secret:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    needs: job-container-secret
+    if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
@@ -72,7 +76,8 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   docker-action-write-token:
-    if: ${{ vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
+    needs: service-container-secret
+    if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
       labels: [self-hosted, flarerunner-1x]
