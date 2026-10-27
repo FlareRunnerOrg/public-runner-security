@@ -7,6 +7,32 @@ interface FixtureWorkflow {
 interface VerdictTriggers {
 	on: { workflow_run: { workflows: string[]; types: string[] } };
 }
+interface AttackJob {
+	permissions?: { [scope: string]: string };
+	environment?: string;
+	env?: { SECURITY_CANARY?: string };
+	container?: { image: string; env: { SECURITY_CANARY: string } };
+	services?: { untrusted: { image: string; env: { SECURITY_CANARY: string } } };
+	steps: {
+		name: string;
+		run?: string;
+		uses?: string;
+		with?: { entrypoint: string; args: string };
+	}[];
+}
+
+interface AttackWorkflow {
+	permissions: { contents: string };
+	jobs: { [name: string]: AttackJob };
+}
+
+async function attackWorkflow(file: string): Promise<AttackWorkflow> {
+	return Bun.YAML.parse(
+		await Bun.file(
+			new URL(`../.github/workflows/${file}`, import.meta.url),
+		).text(),
+	) as AttackWorkflow;
+}
 const fixtures = [
 	{
 		file: "public-security.yml",
@@ -74,6 +100,81 @@ test("every automatic attack/control workflow starts a trusted security verdict"
 			.sort(),
 	);
 	expect(workflow.on.workflow_run.types).toEqual(["completed"]);
+});
+
+test("credential probes retain distinct secret, write-token and OIDC attack inputs", async () => {
+	const workflow = await attackWorkflow("deny-untrusted.yml");
+	expect(workflow.permissions).toEqual({ contents: "read" });
+	expect(workflow.jobs["project-secret"].environment).toBe("security-canary");
+	expect(workflow.jobs["project-secret"].env).toEqual({
+		SECURITY_CANARY: "${{ secrets.FR_SECURITY_CANARY }}",
+	});
+	expect(workflow.jobs["write-token"].permissions).toEqual({
+		contents: "write",
+	});
+	expect(workflow.jobs.oidc.permissions).toEqual({
+		contents: "read",
+		"id-token": "write",
+	});
+});
+
+test("escalation probes cannot substitute a different permission or remove a container secret", async () => {
+	const workflow = await attackWorkflow("deny-escalation.yml");
+	const jobs = workflow.jobs;
+	expect(workflow.permissions).toEqual({ contents: "read" });
+	expect(jobs["empty-token-secret"].permissions).toEqual({});
+	expect(jobs["empty-token-secret"].environment).toBe("security-canary");
+	expect(jobs["empty-token-secret"].env).toEqual({
+		SECURITY_CANARY: "${{ secrets.FR_SECURITY_CANARY }}",
+	});
+	expect(jobs["artifact-read"].permissions).toEqual({
+		actions: "read",
+		contents: "read",
+	});
+	expect(jobs["checks-write"].permissions).toEqual({
+		checks: "write",
+		contents: "read",
+	});
+	expect(jobs["docker-action-write-token"].permissions).toEqual({
+		contents: "write",
+	});
+	for (const name of ["job-container-secret", "service-container-secret"]) {
+		expect(jobs[name].environment).toBe("security-canary");
+		const container =
+			name === "job-container-secret"
+				? jobs[name].container
+				: jobs[name].services?.untrusted;
+		expect(container?.image).toMatch(/^ubuntu:24\.04@sha256:[a-f0-9]{64}$/);
+		expect(container?.env).toEqual({
+			SECURITY_CANARY: "${{ secrets.FR_SECURITY_CANARY }}",
+		});
+	}
+});
+
+test.each([
+	"deny-untrusted.yml",
+	"deny-escalation.yml",
+	"deny-privileged.yml",
+	"deny-workflow-run.yml",
+])("%s makes every executed attack fail visibly", async (file) => {
+	const workflow = await attackWorkflow(file);
+	for (const [name, job] of Object.entries(workflow.jobs)) {
+		expect(job.steps).toHaveLength(1);
+		const [step] = job.steps;
+		expect(step.name).toBe("Must never execute");
+		if (name === "docker-action-write-token") {
+			expect(step.uses).toMatch(
+				/^docker:\/\/ubuntu:24\.04@sha256:[a-f0-9]{64}$/,
+			);
+			expect(step.with).toEqual({
+				entrypoint: "/bin/sh",
+				args: "-c 'echo FR_SECURITY_BOUNDARY_BREACH; exit 1'",
+			});
+		} else {
+			expect(step.uses).toBeUndefined();
+			expect(step.run).toBe("echo FR_SECURITY_BOUNDARY_BREACH; exit 1");
+		}
+	}
 });
 
 test.each([
