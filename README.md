@@ -62,17 +62,23 @@ real cloud, platform, payment, deployment, or customer credentials.
 
 1. Run `bun test` to check the verifier’s false-positive regressions.
 2. Dispatch **Public runner security** on `main` to seed trusted cache data.
-3. Open two harmless same-repository PRs. Each must pass the positive controls and
-   the security verdicts for credential, container/token, and privileged-trigger probes.
+3. Open two harmless same-repository PRs, waiting for each matrix to finish before
+   starting the next. Each must pass the positive controls and the security verdicts
+   for credential, container/token, and privileged-trigger probes. Rejection jobs
+   run in sequence so expected failures cannot overload the test workspace.
 4. Open a harmless PR from the owned fork to test secretless fork execution and
    privileged-trigger rejection. Repository variables are withheld from fork jobs;
    use literal, nonsecret runner routing in the disposable fixture branch.
 5. Dispatch the main control again. Its cache must hit and retain trusted provenance.
-6. Run **Runner cancellation**, cancel it after its final step starts, and verify
-   provider shutdown and runner deregistration.
-7. Close the disposable PRs and delete their branches. Merged branches are deleted automatically.
+6. On one disposable nondefault branch, dispatch both rejection matrices. All nine
+   attacks must be blocked there too, with green security verdicts.
+7. Run **Runner cancellation**, cancel it after its final step starts, and verify
+   provider shutdown and runner deregistration. Dispatch **Security verdict** with
+   its run ID to check the cancellation evidence in CI.
+8. Close the disposable PRs and delete their branches. Merged branches are deleted automatically.
 
-Every completed attack/control run starts a **Security verdict** automatically.
+Each completed main/PR control and rejection workflow starts a **Security verdict**
+automatically. Cancellation uses the manual verdict described above.
 You can also dispatch that workflow with a run ID, or inspect it locally with
 `bun run verify <run-id> auto`. The CLI requires an authorized `gh` session.
 Verification binds the job listing to the recorded run attempt and rejects partial

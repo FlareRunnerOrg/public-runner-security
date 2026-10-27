@@ -1,0 +1,1131 @@
+{
+  "version": 2,
+  "release": "cfc6419bb76e1f14784efaa2fb2d42be7ab81989",
+  "fixture_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+  "worker_version": "fc1e1ee5-eb63-4370-80ca-6d7e341546cd",
+  "runner_image_digest": "sha256:c54213ec9d8e97c5878e85470c356be90451b4bb241647243d5419562f57da2a",
+  "window": {
+    "from": "2026-10-27T04:27:20.124Z",
+    "to": "2026-10-27T04:49:03.541Z"
+  },
+  "verification": {
+    "result": "passed",
+    "first_attempts_only": true,
+    "executing_public_runs": 20,
+    "executed_public_jobs": 53,
+    "policy_denied_jobs": 35,
+    "successful_ci_verdicts": 20
+  },
+  "runner_registrations_absent": true,
+  "results": [
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451620870",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_dispatch",
+      "expected": "cancelled",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122015427922,
+          "name": "lifetime",
+          "conclusion": "cancelled",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451355925",
+      "head_sha": "b99d2a8a07c4cf122401c287296a3abe296a62d2",
+      "event": "workflow_dispatch",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122014581933,
+          "name": "empty-token-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122014710987,
+          "name": "artifact-read",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122014834793,
+          "name": "checks-write",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122014946558,
+          "name": "job-container-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122015067128,
+          "name": "service-container-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122015184675,
+          "name": "docker-action-write-token",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451352860",
+      "head_sha": "b99d2a8a07c4cf122401c287296a3abe296a62d2",
+      "event": "workflow_dispatch",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122014571348,
+          "name": "project-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122014684301,
+          "name": "write-token",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122014800030,
+          "name": "oidc",
+          "conclusion": "failure",
+          "reason": "untrusted_oidc"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451278607",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_run",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122014330613,
+          "name": "workflow-run",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451120781",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_dispatch",
+      "expected": "baseline",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122013831556,
+          "name": "baseline",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122013831839,
+          "name": "mask",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122014033842,
+          "name": "isolation",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122014189696,
+          "name": "guest-root",
+          "conclusion": "success",
+          "reason": null
+        }
+      ],
+      "cache": {
+        "hit": true,
+        "scope": "trusted-default-branch"
+      },
+      "retained_mask": {
+        "run": 40451120781,
+        "job": 122013831839,
+        "result": "passed",
+        "chunks_checked": 30,
+        "masked_marker": true,
+        "completion_marker": true,
+        "raw_canary_absent": true
+      }
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451059115",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_run",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122013628112,
+          "name": "workflow-run",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450886440",
+      "head_sha": "881e693c2d97dc4dbec0d86219df55ca5ef8e03b",
+      "event": "pull_request",
+      "expected": "baseline",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122013078982,
+          "name": "baseline",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122013274865,
+          "name": "isolation",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122013457770,
+          "name": "guest-root",
+          "conclusion": "success",
+          "reason": null
+        }
+      ],
+      "cache": {
+        "hit": false,
+        "scope": "untrusted-pr-33"
+      }
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450886266",
+      "head_sha": "881e693c2d97dc4dbec0d86219df55ca5ef8e03b",
+      "event": "pull_request_target",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122013079369,
+          "name": "pull-request-target",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450735550",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_run",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122012580003,
+          "name": "workflow-run",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510125",
+      "head_sha": "17f2479a006c821c964dfa14fe45c06a72ca2889",
+      "event": "pull_request_target",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122011857198,
+          "name": "pull-request-target",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510056",
+      "head_sha": "17f2479a006c821c964dfa14fe45c06a72ca2889",
+      "event": "pull_request",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122011855818,
+          "name": "empty-token-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122012092230,
+          "name": "artifact-read",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122012328001,
+          "name": "checks-write",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122012418491,
+          "name": "job-container-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122012585124,
+          "name": "service-container-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122012732059,
+          "name": "docker-action-write-token",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510046",
+      "head_sha": "17f2479a006c821c964dfa14fe45c06a72ca2889",
+      "event": "pull_request",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122011855822,
+          "name": "project-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122011997630,
+          "name": "write-token",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122012159134,
+          "name": "oidc",
+          "conclusion": "failure",
+          "reason": "untrusted_oidc"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510039",
+      "head_sha": "17f2479a006c821c964dfa14fe45c06a72ca2889",
+      "event": "pull_request",
+      "expected": "baseline",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122011856369,
+          "name": "baseline",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122012118122,
+          "name": "isolation",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122012297588,
+          "name": "guest-root",
+          "conclusion": "success",
+          "reason": null
+        }
+      ],
+      "cache": {
+        "hit": false,
+        "scope": "untrusted-pr-32"
+      }
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450353665",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_run",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122011365809,
+          "name": "workflow-run",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129920",
+      "head_sha": "b99d2a8a07c4cf122401c287296a3abe296a62d2",
+      "event": "pull_request_target",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122010649616,
+          "name": "pull-request-target",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129872",
+      "head_sha": "b99d2a8a07c4cf122401c287296a3abe296a62d2",
+      "event": "pull_request",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122010647919,
+          "name": "project-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122010841592,
+          "name": "write-token",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122011028556,
+          "name": "oidc",
+          "conclusion": "failure",
+          "reason": "untrusted_oidc"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129854",
+      "head_sha": "b99d2a8a07c4cf122401c287296a3abe296a62d2",
+      "event": "pull_request",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122010647981,
+          "name": "empty-token-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122010876161,
+          "name": "artifact-read",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122010978284,
+          "name": "checks-write",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        },
+        {
+          "id": 122011207730,
+          "name": "job-container-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122011387792,
+          "name": "service-container-secret",
+          "conclusion": "failure",
+          "reason": "untrusted_secrets"
+        },
+        {
+          "id": 122011540622,
+          "name": "docker-action-write-token",
+          "conclusion": "failure",
+          "reason": "untrusted_token_permissions"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129846",
+      "head_sha": "b99d2a8a07c4cf122401c287296a3abe296a62d2",
+      "event": "pull_request",
+      "expected": "baseline",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122010648421,
+          "name": "baseline",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122010859153,
+          "name": "isolation",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122011173689,
+          "name": "guest-root",
+          "conclusion": "success",
+          "reason": null
+        }
+      ],
+      "cache": {
+        "hit": false,
+        "scope": "untrusted-pr-31"
+      }
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450022121",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_run",
+      "expected": "denied",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122010313827,
+          "name": "workflow-run",
+          "conclusion": "failure",
+          "reason": "privileged_event"
+        }
+      ]
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40449829539",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "event": "workflow_dispatch",
+      "expected": "baseline",
+      "attempt": 1,
+      "result": "passed",
+      "jobs": [
+        {
+          "id": 122009691439,
+          "name": "baseline",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122009691667,
+          "name": "mask",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122010019475,
+          "name": "isolation",
+          "conclusion": "success",
+          "reason": null
+        },
+        {
+          "id": 122010170767,
+          "name": "guest-root",
+          "conclusion": "success",
+          "reason": null
+        }
+      ],
+      "cache": {
+        "hit": false,
+        "scope": "trusted-default-branch"
+      },
+      "retained_mask": {
+        "run": 40449829539,
+        "job": 122009691667,
+        "result": "passed",
+        "chunks_checked": 26,
+        "masked_marker": true,
+        "completion_marker": true,
+        "raw_canary_absent": true
+      }
+    }
+  ],
+  "ci_verdicts": [
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451777122",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451620870",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451588373",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451355925",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451470694",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451352860",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451315000",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451278607",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451278716",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451120781",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451094998",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451059115",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451058983",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450886440",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450954294",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450886266",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450824469",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510056",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450787778",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450735550",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450735594",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510039",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450699124",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510046",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450597726",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450510125",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450455224",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129854",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450400560",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450353665",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450353617",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129846",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450317141",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129872",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450243904",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450129920",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450063446",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450022121",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    },
+    {
+      "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40450022220",
+      "source_run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40449829539",
+      "head_sha": "27d313f2294727394abb743fe5d6d2436de31e85",
+      "result": "passed"
+    }
+  ],
+  "policy_matches": [
+    {
+      "run_id": 40451355925,
+      "job_id": 122015184675,
+      "event": "workflow_dispatch",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "write",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451355925,
+      "job_id": 122015067128,
+      "event": "workflow_dispatch",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451355925,
+      "job_id": 122014946558,
+      "event": "workflow_dispatch",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451355925,
+      "job_id": 122014834793,
+      "event": "workflow_dispatch",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "checks": "write",
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451352860,
+      "job_id": 122014800030,
+      "event": "workflow_dispatch",
+      "secret_count": 0,
+      "oidc_requested": true,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451355925,
+      "job_id": 122014710987,
+      "event": "workflow_dispatch",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "actions": "read",
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451352860,
+      "job_id": 122014684301,
+      "event": "workflow_dispatch",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "write",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451355925,
+      "job_id": 122014581933,
+      "event": "workflow_dispatch",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451352860,
+      "job_id": 122014571348,
+      "event": "workflow_dispatch",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451278607,
+      "job_id": 122014330613,
+      "event": "workflow_run",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40451059115,
+      "job_id": 122013628112,
+      "event": "workflow_run",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450886266,
+      "job_id": 122013079369,
+      "event": "pull_request_target",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510056,
+      "job_id": 122012732059,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "write",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450735550,
+      "job_id": 122012580003,
+      "event": "workflow_run",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510056,
+      "job_id": 122012585124,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510056,
+      "job_id": 122012418491,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510046,
+      "job_id": 122012159134,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": true,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510056,
+      "job_id": 122012328001,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "checks": "write",
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510056,
+      "job_id": 122012092230,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "actions": "read",
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510046,
+      "job_id": 122011997630,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "write",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510125,
+      "job_id": 122011857198,
+      "event": "pull_request_target",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510056,
+      "job_id": 122011855818,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450510046,
+      "job_id": 122011855822,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129854,
+      "job_id": 122011540622,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "write",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129854,
+      "job_id": 122011387792,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450353665,
+      "job_id": 122011365809,
+      "event": "workflow_run",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129854,
+      "job_id": 122011207730,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129872,
+      "job_id": 122011028556,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": true,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129854,
+      "job_id": 122010978284,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "checks": "write",
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129872,
+      "job_id": 122010841592,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "write",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129920,
+      "job_id": 122010649616,
+      "event": "pull_request_target",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129854,
+      "job_id": 122010876161,
+      "event": "pull_request",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "actions": "read",
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129854,
+      "job_id": 122010647981,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450129872,
+      "job_id": 122010647919,
+      "event": "pull_request",
+      "secret_count": 1,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    },
+    {
+      "run_id": 40450022121,
+      "job_id": 122010313827,
+      "event": "workflow_run",
+      "secret_count": 0,
+      "oidc_requested": false,
+      "token_permissions": {
+        "contents": "read",
+        "metadata": "read"
+      }
+    }
+  ],
+  "cancellation": {
+    "run": "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40451620870",
+    "job": 122015427922,
+    "requested_at": "2026-10-27T04:47:26.303Z",
+    "provider_stopped_at": "2026-10-27T04:48:27.282Z",
+    "result": "passed",
+    "workload_started": true,
+    "normal_cancellation": true,
+    "provider_state": "stopped",
+    "runner_registration_absent": true
+  },
+  "compatibility": {
+    "result": "passed",
+    "operator_verified": true,
+    "private_run": 40446671331,
+    "jobs": [
+      "ubuntu-contract",
+      "services-contract",
+      "job-container-contract"
+    ]
+  },
+  "earlier_incomplete_campaigns": [
+    {
+      "release": "5addafac3439f1ded5af03e3e1a051c9bfa77382",
+      "cause": "Redundant installation-binding writes exhausted D1 catalog revision retries during fork ingress. Fixed in cfc6419.",
+      "failed_verdicts": [
+        "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40445145182",
+        "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40445144368"
+      ]
+    },
+    {
+      "release": "cfc6419bb76e1f14784efaa2fb2d42be7ab81989",
+      "cause": "Expanded parallel fixtures reached the test workspace concurrency limit. One positive control received 88 pending admission responses while unfunded; CI correctly rejected incomplete evidence. This does not identify one cause for every earlier failure. The qualified campaign sequences probes within capacity; saturation liveness is not qualified.",
+      "failed_verdicts": [
+        "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40447612432",
+        "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40447943047",
+        "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40447881432",
+        "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/40448024486"
+      ]
+    }
+  ]
+}
