@@ -231,11 +231,33 @@ describe("complete PR acceptance", () => {
 			"failed",
 		);
 	});
-	test.each(["success", "skipped", "cancelled", "timed_out"])(
+	test("successful attack workflow wrappers pass only with all eleven verified admission failures", async () => {
+		const f = fixture();
+		for (const run of [...f.all, f.child]) run.conclusion = "success";
+		const report = await assessAcceptance(anchor, f.reader, options);
+		expect(report.state).toBe("passed");
+		expect(
+			report.rows.filter((row) =>
+				row.detail.startsWith("Blocked before execution"),
+			),
+		).toHaveLength(11);
+	});
+	test.each(["skipped", "cancelled", "timed_out", "neutral", null])(
 		"an attack workflow with %s is a real failure",
 		async (conclusion) => {
 			const f = fixture();
 			f.all[2].conclusion = conclusion;
+			expect((await assessAcceptance(anchor, f.reader, options)).state).toBe(
+				"failed",
+			);
+		},
+	);
+	test.each(["success", "skipped", "cancelled", "timed_out"])(
+		"a green workflow wrapper never accepts an attack job with %s",
+		async (conclusion) => {
+			const f = fixture();
+			f.all[2].conclusion = "success";
+			f.jobs.get(40)![0].conclusion = conclusion;
 			expect((await assessAcceptance(anchor, f.reader, options)).state).toBe(
 				"failed",
 			);
@@ -268,6 +290,7 @@ describe("complete PR acceptance", () => {
 		"FR_SECURITY_BOUNDARY_BREACH",
 	])("incorrect rejection evidence fails: %s", async (log) => {
 		const f = fixture();
+		f.all[2].conclusion = "success";
 		f.logs.set(400, log);
 		expect((await assessAcceptance(anchor, f.reader, options)).state).toBe(
 			"failed",
@@ -275,6 +298,7 @@ describe("complete PR acceptance", () => {
 	});
 	test("customer execution cannot pass by printing the expected denial", async () => {
 		const f = fixture();
+		f.all[2].conclusion = "success";
 		f.jobs.get(40)![0].steps = [
 			{
 				name: "FlareRunner admission",

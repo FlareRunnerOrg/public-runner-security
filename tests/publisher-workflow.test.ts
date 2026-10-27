@@ -39,6 +39,11 @@ test("disabled tests cannot silently skip publication", () => {
 	workflow.jobs.acceptance.if += " && vars.FR_SECURITY_TEST_ENABLED == 'true'";
 	expect(() => assertTrustedPublisher(workflow)).toThrow();
 });
+test("acceptance failures cannot be made non-fatal", () => {
+	const workflow = fixture();
+	Object.assign(workflow.jobs.acceptance, { "continue-on-error": true });
+	expect(() => assertTrustedPublisher(workflow)).toThrow();
+});
 test("untrusted expressions cannot be interpolated into the publisher shell", () => {
 	const workflow = fixture();
 	workflow.jobs.acceptance.steps[2].run =

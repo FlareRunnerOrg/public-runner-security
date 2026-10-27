@@ -141,8 +141,13 @@ export function contractFor(run: FixtureRun): Contract {
 		if (run.event === "workflow_dispatch")
 			assert.notEqual(run.head_branch, "main");
 	}
+	// Job-level continue-on-error may make the workflow succeed. Only the
+	// assigned job's admission failure and exact policy evidence prove rejection.
 	if (contract.kind === "denied")
-		assert.equal(run.conclusion, "failure", "Attack was not rejected");
+		assert(
+			run.conclusion === "failure" || run.conclusion === "success",
+			"Attack workflow did not complete normally",
+		);
 	if (contract.kind === "cancelled") assert.equal(run.conclusion, "cancelled");
 	return contract;
 }
