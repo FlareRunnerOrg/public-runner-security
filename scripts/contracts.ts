@@ -33,6 +33,10 @@ export function contractFor(run: FixtureRun): Contract {
 	);
 	assert.equal(run.status, "completed", "Evidence is not terminal");
 	assert(Number.isSafeInteger(run.id) && run.id > 0, "Invalid run identity");
+	assert.equal(
+		run.html_url,
+		`https://github.com/${repository}/actions/runs/${run.id}`,
+	);
 	assert(
 		Number.isSafeInteger(run.run_attempt) && run.run_attempt > 0,
 		"Invalid attempt identity",

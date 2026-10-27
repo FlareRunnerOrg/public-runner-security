@@ -13,11 +13,21 @@ export interface WorkflowJob {
 	html_url: string;
 }
 
+export const attackJobPrefix = "Attack probe — expected rejection: ";
+
+// Historical evidence used the probe ID directly. Both forms identify the same contract.
+export function probeId(name: string): string {
+	return name.startsWith(attackJobPrefix)
+		? name.slice(attackJobPrefix.length)
+		: name;
+}
+
 export function assertJobCoverage(
 	jobs: WorkflowJob[],
 	expected: string[],
 	allowedSkipped: string[] = [],
 ): WorkflowJob[] {
+	jobs = jobs.map((job) => ({ ...job, name: probeId(job.name) }));
 	for (const name of expected) {
 		const matches = jobs.filter((job) => job.name === name);
 		if (matches.length !== 1)
