@@ -1,8 +1,14 @@
 import { expect, test } from "bun:test";
+import { probeId } from "../scripts/outcome.ts";
 
 interface FixtureWorkflow {
 	name: string;
-	jobs: { [name: string]: { "runs-on": { group: string; labels: string[] } } };
+	jobs: {
+		[name: string]: {
+			name?: string;
+			"runs-on": { group: string; labels: string[] };
+		};
+	};
 }
 interface VerdictTriggers {
 	on: { workflow_run: { workflows: string[]; types: string[] } };
@@ -78,7 +84,8 @@ test.each(fixtures)(
 		const workflow = Bun.YAML.parse(source) as FixtureWorkflow;
 		expect(workflow.name).toBe(fixture.name);
 		expect(Object.keys(workflow.jobs).sort()).toEqual([...fixture.jobs].sort());
-		for (const job of Object.values(workflow.jobs)) {
+		for (const [name, job] of Object.entries(workflow.jobs)) {
+			expect(probeId(job.name ?? name)).toBe(name);
 			expect(job["runs-on"].labels).toEqual(["self-hosted", "flarerunner-1x"]);
 			expect([
 				"${{ vars.FLARERUNNER_RUNNER_GROUP }}",

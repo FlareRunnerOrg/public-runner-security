@@ -1,4 +1,5 @@
 name: Reject container and token escalation
+run-name: "Attack probes — expected rejections: containers and tokens / ${{ github.head_ref || github.ref_name }}"
 on:
   pull_request:
   workflow_dispatch:
@@ -6,6 +7,7 @@ permissions:
   contents: read
 jobs:
   empty-token-secret:
+    name: "Attack probe — expected rejection: empty-token-secret"
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
       group: ${{ vars.FLARERUNNER_RUNNER_GROUP }}
@@ -21,6 +23,7 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   artifact-read:
+    name: "Attack probe — expected rejection: artifact-read"
     needs: empty-token-secret
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
@@ -34,6 +37,7 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   checks-write:
+    name: "Attack probe — expected rejection: checks-write"
     needs: artifact-read
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
@@ -47,6 +51,7 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   job-container-secret:
+    name: "Attack probe — expected rejection: job-container-secret"
     needs: checks-write
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
@@ -64,6 +69,7 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   service-container-secret:
+    name: "Attack probe — expected rejection: service-container-secret"
     needs: job-container-secret
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
@@ -82,6 +88,7 @@ jobs:
       - name: Must never execute
         run: echo FR_SECURITY_BOUNDARY_BREACH; exit 1
   docker-action-write-token:
+    name: "Attack probe — expected rejection: docker-action-write-token"
     needs: service-container-secret
     if: ${{ always() && vars.FR_SECURITY_TEST_ENABLED == 'true' && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')) }}
     runs-on:
