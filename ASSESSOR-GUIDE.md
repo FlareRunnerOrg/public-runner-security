@@ -224,6 +224,13 @@ unrelated error, or a job that executes the attack does not qualify. A green att
 workflow wrapper alone proves nothing. Keep the fatal verifier and aggregate
 checks enabled.
 
+A generic admission denial is also insufficient. For example, an upstream GitHub
+API timeout can stop a job safely before its credential policy is evaluated.
+Keep that failed cohort, obtain the cause from FlareRunner diagnostic evidence,
+and trigger a fresh complete PR cohort with a new commit after the transient
+problem is resolved. Do not rerun one attack job in isolation or relax the exact
+policy-marker requirement to turn the result green. Record both cohort IDs.
+
 Request operator evidence, bound to the exact campaign jobs, for:
 
 - The runner image digest and the release actually used by those jobs.
