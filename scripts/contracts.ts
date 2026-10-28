@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
-export const repository = "FlareRunnerOrg/public-runner-security";
+import { suite } from "./suite.ts";
+export const repository = suite.repository;
 export type DenialReason =
 	| "untrusted_secrets"
 	| "untrusted_oidc"

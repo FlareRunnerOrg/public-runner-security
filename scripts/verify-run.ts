@@ -1,8 +1,12 @@
 import { appendFile } from "node:fs/promises";
 import { contractFor, repository, type FixtureRun } from "./contracts.ts";
 import { gh } from "./github.ts";
+import { assertSuiteContext } from "./suite.ts";
 import { verifyRun } from "./verification.ts";
 import { verifiedRows, renderReport } from "./report.ts";
+
+if (process.env.GITHUB_ACTIONS === "true")
+	assertSuiteContext(process.env.GITHUB_REPOSITORY);
 
 const [runId, kind] = Bun.argv.slice(2);
 if (!runId || !/^\d+$/.test(runId))

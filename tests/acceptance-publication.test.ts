@@ -1,9 +1,9 @@
+import { repository } from "../scripts/contracts.ts";
 import { expect, test } from "bun:test";
 import { publishAcceptanceStatus } from "../scripts/acceptance-publication.ts";
 import type { AcceptanceReport } from "../scripts/report.ts";
 
-const details =
-	"https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/42";
+const details = `https://github.com/${repository}/actions/runs/42`;
 const report: AcceptanceReport = {
 	state: "passed",
 	sha: "a".repeat(40),
@@ -40,7 +40,7 @@ test.each([
 					"api",
 					"--method",
 					"POST",
-					`repos/FlareRunnerOrg/public-runner-security/statuses/${report.sha}`,
+					`repos/${repository}/statuses/${report.sha}`,
 					"--input",
 					"-",
 				]);
@@ -78,6 +78,12 @@ test("a failed status write is not swallowed", async () => {
 test.each([
 	{ sha: "not-a-sha", details },
 	{ sha: report.sha, details: "https://attacker.test/report" },
+	{
+		sha: report.sha,
+		details: "https://github.com/other/repository/actions/runs/42",
+	},
+	{ sha: report.sha, details: `${details}?run=another` },
+	{ sha: report.sha, details: `${details}/../43` },
 ])(
 	"invalid publication identities cannot reach the API %#",
 	async (identity) => {

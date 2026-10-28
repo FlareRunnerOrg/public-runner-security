@@ -1,18 +1,21 @@
 import { describe, expect, test } from "bun:test";
-import { contractFor, type FixtureRun } from "../scripts/contracts.ts";
+import {
+	contractFor,
+	repository,
+	type FixtureRun,
+} from "../scripts/contracts.ts";
 const run: FixtureRun = {
 	id: 42,
 	status: "completed",
 	conclusion: "failure",
-	html_url:
-		"https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/42",
+	html_url: `https://github.com/${repository}/actions/runs/42`,
 	head_sha: "a".repeat(40),
 	head_branch: "fixture",
 	event: "pull_request",
 	name: "Reject container and token escalation",
 	path: ".github/workflows/deny-escalation.yml",
 	run_attempt: 1,
-	repository: { full_name: "FlareRunnerOrg/public-runner-security" },
+	repository: { full_name: repository },
 };
 describe("trusted verifier contract", () => {
 	test("custom display names cannot change the registered workflow contract", () => {

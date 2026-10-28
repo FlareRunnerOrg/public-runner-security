@@ -1,3 +1,4 @@
+import { repository } from "../scripts/contracts.ts";
 import { expect, test } from "bun:test";
 import {
 	renderReport,
@@ -49,7 +50,7 @@ test("metadata cannot inject a second table row, link, or HTML into the summary"
 });
 test("verified denials link to the exact job and distinguish cancellation evidence", () => {
 	const run = {
-		run: "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/123",
+		run: `https://github.com/${repository}/actions/runs/123`,
 		head_sha: report.sha,
 		event: "pull_request",
 		expected: "denied" as const,

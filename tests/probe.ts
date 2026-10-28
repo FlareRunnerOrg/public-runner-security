@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { assertNoPlatformCredentials } from "../scripts/credential-boundary.ts";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 
-const repository = "FlareRunnerOrg/public-runner-security";
+import { repository } from "../scripts/contracts.ts";
 const sentinels = [
 	"/tmp/fr-security-persistence-canary",
 	"/home/runner/.fr-security-persistence-canary",
