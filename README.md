@@ -7,8 +7,9 @@ against our production runners using a dummy secret and disposable branches.
 
 ## Read the overall result
 
-Open **Security acceptance** on the tested commit or PR, or follow the badge above.
-Its report lists each required test, its result and its evidence. A rejected attack
+Open the **Security acceptance** status on the tested commit or PR to view its
+linked workflow report, or follow the badge above. The report lists each required
+test, its result and its evidence. A rejected attack
 appears as **Passed — blocked before execution**. A missing workflow, wrong denial,
 executed attack or failed positive control makes acceptance fail. While work is
 running the check stays pending; disabled testing is **Not run**, never a green pass.
@@ -41,15 +42,22 @@ GitHub’s job metadata and logs for every required probe. A rejected attack mus
 An attack that runs, an unrelated failure, a missing probe, a timeout, or a
 cancellation fails verification. Customer output cannot impersonate the platform
 step. Jobs labelled **Attack probe — expected rejection** intentionally show
-`Failure` when the runner rejects them. The acceptance report shows whether that
-rejection passed its security assertion. Raw jobs and historical failures stay
-available as evidence.
+`Failure` when the runner rejects them. Their workflows use GitHub's job-level
+`continue-on-error` so these expected failures do not send routine failed-workflow
+emails. The job results and admission logs stay available as evidence.
+
+A green probe workflow is not a security verdict. **Security verdict** and
+**Security acceptance** still fail for executed attacks, missing or skipped probes,
+incorrect denials, infrastructure errors and failed positive controls. Those checks
+remain fatal and produce the usual failure notifications. Use their results to
+judge the suite; historical failures are preserved.
 
 The verifier runs on GitHub-hosted infrastructure with read-only permissions. It
 checks out the protected branch’s verifier revision, never the triggering PR’s
 code, and never downloads or executes its artifacts. The aggregate publisher also
-uses trusted protected-branch code and has only the additional `checks: write`
-permission needed to attach its report to the tested commit. This follows GitHub’s
+uses trusted protected-branch code and has only the additional `statuses: write`
+permission needed to link its report from the tested commit. Commit statuses keep
+reporting separate from the Actions job evidence being verified. This follows GitHub’s
 [guidance on privileged workflow triggers](https://docs.github.com/en/actions/reference/security/secure-use).
 
 ## What we exercise

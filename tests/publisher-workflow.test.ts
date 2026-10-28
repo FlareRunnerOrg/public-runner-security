@@ -11,8 +11,13 @@ function fixture(): PublisherWorkflow {
 	return Bun.YAML.parse(source) as PublisherWorkflow;
 }
 
-test("the reporting workflow uses protected source, a hosted runner and only checks write authority", () => {
+test("the reporting workflow uses protected source, a hosted runner and only commit-status write authority", () => {
 	expect(() => assertTrustedPublisher(fixture())).not.toThrow();
+});
+test("the reporter cannot create Actions-owned checks that contaminate workflow evidence", () => {
+	const workflow = fixture();
+	Object.assign(workflow.permissions, { checks: "write" });
+	expect(() => assertTrustedPublisher(workflow)).toThrow();
 });
 test.each([
 	"${{ github.event.workflow_run.head_sha }}",

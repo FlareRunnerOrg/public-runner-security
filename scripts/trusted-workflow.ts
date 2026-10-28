@@ -63,7 +63,7 @@ export function assertTrustedVerifier(workflow: VerifierWorkflow): void {
 }
 
 export interface PublisherWorkflow {
-	permissions: { contents: string; actions: string; checks: string };
+	permissions: { contents: string; actions: string; statuses: string };
 	on: {
 		workflow_run: { workflows: string[]; types: string[] };
 		workflow_dispatch: {
@@ -103,7 +103,7 @@ export function assertTrustedPublisher(workflow: PublisherWorkflow): void {
 	assert.deepEqual(workflow.permissions, {
 		contents: "read",
 		actions: "read",
-		checks: "write",
+		statuses: "write",
 	});
 	assert.deepEqual(workflow.on.workflow_run, {
 		workflows: ["Fixture checks"],

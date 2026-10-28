@@ -6,6 +6,7 @@ interface FixtureWorkflow {
 	jobs: {
 		[name: string]: {
 			name?: string;
+			"continue-on-error"?: boolean;
 			"runs-on": { group: string; labels: string[] };
 		};
 	};
@@ -21,6 +22,7 @@ interface AttackJob {
 	services?: { untrusted: { image: string; env: { SECURITY_CANARY: string } } };
 	steps: {
 		name: string;
+		"continue-on-error"?: boolean;
 		run?: string;
 		uses?: string;
 		with?: { entrypoint: string; args: string };
@@ -85,6 +87,9 @@ test.each(fixtures)(
 		expect(workflow.name).toBe(fixture.name);
 		expect(Object.keys(workflow.jobs).sort()).toEqual([...fixture.jobs].sort());
 		for (const [name, job] of Object.entries(workflow.jobs)) {
+			expect(job["continue-on-error"] ?? false).toBe(
+				fixture.file.startsWith("deny-"),
+			);
 			expect(probeId(job.name ?? name)).toBe(name);
 			expect(job["runs-on"].labels).toEqual(["self-hosted", "flarerunner-1x"]);
 			expect([
@@ -177,6 +182,7 @@ test.each([
 	for (const [name, job] of Object.entries(workflow.jobs)) {
 		expect(job.steps).toHaveLength(1);
 		const [step] = job.steps;
+		expect(step["continue-on-error"]).toBeUndefined();
 		expect(step.name).toBe("Must never execute");
 		if (name === "docker-action-write-token") {
 			expect(step.uses).toMatch(
