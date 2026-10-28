@@ -31,7 +31,10 @@ test("the summary identifies the exact revision, date, observed production relea
 	expect(output).toContain(report.productionSha!);
 	expect(output).toContain(report.checkedAt);
 	expect(output).toContain(report.scope);
-	expect(output).toContain("GitHub does not attest the runner image digest");
+	expect(output).toContain(repository);
+	expect(output).toContain(
+		"does not attest the release or image used by historical jobs",
+	);
 });
 test("unresolved and disabled coverage is never presented as a passing suite", () => {
 	for (const state of ["failed", "pending", "not_run"] as const) {

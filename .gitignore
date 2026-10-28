@@ -1,3 +1,4 @@
 .security-cache/
 node_modules/
 results.local.json
+reports.local/

@@ -10,7 +10,8 @@
 		"verify": "bun scripts/verify-run.ts",
 		"configure": "bun scripts/configure.ts",
 		"prepare-fork": "bun scripts/prepare-fork.ts",
-		"configure-canary": "bun scripts/configure-canary.ts"
+		"configure-canary": "bun scripts/configure-canary.ts",
+		"review": "bun scripts/review-acceptance.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "1.4.4",

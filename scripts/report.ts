@@ -1,4 +1,5 @@
 import type { VerifiedRun } from "./verification.ts";
+import { repository } from "./contracts.ts";
 
 export interface ReportRow {
 	test: string;
@@ -50,6 +51,7 @@ export function renderReport(
 	return [
 		`## ${title}`,
 		"",
+		`**Repository:** ${text(repository)}  `,
 		`**Tested commit:** \`${report.sha}\`  `,
 		`**Scope:** ${text(report.scope)}  `,
 		`**Checked:** ${text(report.checkedAt)}  `,
@@ -61,7 +63,7 @@ export function renderReport(
 		"",
 		"Raw attack jobs remain red when admission blocks them. A passing row requires the exact policy denial before any customer code or container setup.",
 		"",
-		"This report verifies GitHub job evidence. GitHub does not attest the runner image digest, retained-log masking or provider teardown. The [full qualification record](https://github.com/FlareRunnerOrg/public-runner-security/blob/main/QUALIFICATION.md) records those separately, with the tested release, image digest and date.",
+		"This report verifies GitHub job evidence. The production release above is observed during verification; it does not attest the release or image used by historical jobs. Retained-log masking and provider teardown also need separate operator evidence. [FlareRunner's historical qualification record](https://github.com/FlareRunnerOrg/public-runner-security/blob/main/QUALIFICATION.md) is upstream evidence, not qualification of another workspace. Use the assessor guide and assessment template in your reviewed suite checkout for a new campaign.",
 		"",
 	].join("\n");
 }
