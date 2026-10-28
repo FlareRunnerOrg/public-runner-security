@@ -138,3 +138,8 @@ GitHub log masking does not prove masking in FlareRunner’s retained logs; the
 qualification driver checks that separately. Runner deregistration does not prove
 physical disk erasure; provider shutdown is separate evidence. An owned fork tests
 fork isolation, not GitHub’s approval behavior for an unrelated first-time contributor.
+
+## License
+
+This suite and its documentation are available under the [MIT License](LICENSE).
+Copyright (c) 2026 FlareRunner.

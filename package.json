@@ -1,5 +1,6 @@
 {
 	"name": "flarerunner-public-security-fixtures",
+	"license": "MIT",
 	"private": true,
 	"packageManager": "bun@1.4.4",
 	"scripts": {
