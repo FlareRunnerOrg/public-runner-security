@@ -3,6 +3,7 @@ import { assertNoPlatformCredentials } from "../scripts/credential-boundary.ts";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 
 import { repository } from "../scripts/contracts.ts";
+import { assertDummyCanary } from "../scripts/dummy-canary.ts";
 const sentinels = [
 	"/tmp/fr-security-persistence-canary",
 	"/home/runner/.fr-security-persistence-canary",
@@ -183,6 +184,7 @@ async function baseline(): Promise<void> {
 
 async function mask(): Promise<void> {
 	const canary = required("SECURITY_CANARY");
+	assertDummyCanary(canary);
 	assert.equal(
 		new Bun.CryptoHasher("sha256").update(canary).digest("hex"),
 		required("SECURITY_CANARY_SHA256"),

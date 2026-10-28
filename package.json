@@ -9,7 +9,8 @@
 		"probe": "bun tests/probe.ts",
 		"verify": "bun scripts/verify-run.ts",
 		"configure": "bun scripts/configure.ts",
-		"prepare-fork": "bun scripts/prepare-fork.ts"
+		"prepare-fork": "bun scripts/prepare-fork.ts",
+		"configure-canary": "bun scripts/configure-canary.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "1.4.4",
