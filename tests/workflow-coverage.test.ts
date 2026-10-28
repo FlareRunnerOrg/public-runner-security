@@ -92,10 +92,9 @@ test.each(fixtures)(
 			);
 			expect(probeId(job.name ?? name)).toBe(name);
 			expect(job["runs-on"].labels).toEqual(["self-hosted", "flarerunner-1x"]);
-			expect([
-				"${{ vars.FLARERUNNER_RUNNER_GROUP }}",
-				"flarerunner-frg-07f27f39f72bfbc1",
-			]).toContain(job["runs-on"].group);
+			const group = job["runs-on"].group;
+			if (group !== "${{ vars.FLARERUNNER_RUNNER_GROUP }}")
+				expect(group).toMatch(/^flarerunner-frg-[a-f0-9]{16}$/);
 		}
 	},
 );

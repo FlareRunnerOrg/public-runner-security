@@ -14,6 +14,17 @@ function fixture(): PublisherWorkflow {
 test("the reporting workflow uses protected source, a hosted runner and only commit-status write authority", () => {
 	expect(() => assertTrustedPublisher(fixture())).not.toThrow();
 });
+test.each([
+	"FlareRunnerOrg/public-runner-security",
+	"${{ github.event.workflow_run.head_repository.full_name }}",
+])(
+	"the publisher cannot select another source repository: %s",
+	(repository) => {
+		const workflow = fixture();
+		workflow.jobs.acceptance.steps[0].with!.repository = repository;
+		expect(() => assertTrustedPublisher(workflow)).toThrow();
+	},
+);
 test("the reporter cannot create Actions-owned checks that contaminate workflow evidence", () => {
 	const workflow = fixture();
 	Object.assign(workflow.permissions, { checks: "write" });

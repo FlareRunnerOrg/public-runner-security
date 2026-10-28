@@ -1,3 +1,4 @@
+import { repository } from "../scripts/contracts.ts";
 import { expect, test } from "bun:test";
 import {
 	renderReport,
@@ -30,7 +31,10 @@ test("the summary identifies the exact revision, date, observed production relea
 	expect(output).toContain(report.productionSha!);
 	expect(output).toContain(report.checkedAt);
 	expect(output).toContain(report.scope);
-	expect(output).toContain("GitHub does not attest the runner image digest");
+	expect(output).toContain(repository);
+	expect(output).toContain(
+		"does not attest the release or image used by historical jobs",
+	);
 });
 test("unresolved and disabled coverage is never presented as a passing suite", () => {
 	for (const state of ["failed", "pending", "not_run"] as const) {
@@ -49,7 +53,7 @@ test("metadata cannot inject a second table row, link, or HTML into the summary"
 });
 test("verified denials link to the exact job and distinguish cancellation evidence", () => {
 	const run = {
-		run: "https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/123",
+		run: `https://github.com/${repository}/actions/runs/123`,
 		head_sha: report.sha,
 		event: "pull_request",
 		expected: "denied" as const,

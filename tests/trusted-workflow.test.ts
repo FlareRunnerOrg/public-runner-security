@@ -15,6 +15,14 @@ test("the actual workflow keeps the verifier on trusted, read-only GitHub-hosted
 	expect(() => assertTrustedVerifier(fixture())).not.toThrow();
 });
 test.each([
+	"FlareRunnerOrg/public-runner-security",
+	"${{ github.event.workflow_run.head_repository.full_name }}",
+])("the verifier cannot select another source repository: %s", (repository) => {
+	const workflow = fixture();
+	workflow.jobs.verify.steps[0].with!.repository = repository;
+	expect(() => assertTrustedVerifier(workflow)).toThrow();
+});
+test.each([
 	"${{ github.event.workflow_run.head_sha }}",
 	"${{ github.event.pull_request.head.sha }}",
 	"main",

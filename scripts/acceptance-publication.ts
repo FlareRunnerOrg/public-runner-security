@@ -10,9 +10,15 @@ export async function publishAcceptanceStatus(
 	request: typeof gh = gh,
 ): Promise<void> {
 	assert.match(report.sha, /^[a-f0-9]{40}$/);
+	const prefix = `https://github.com/${repository}/actions/runs/`;
+	assert(
+		details.startsWith(prefix),
+		"Report URL belongs to another repository",
+	);
 	assert.match(
-		details,
-		/^https:\/\/github\.com\/FlareRunnerOrg\/public-runner-security\/actions\/runs\/\d+$/,
+		details.slice(prefix.length),
+		/^[1-9][0-9]*$/,
+		"Invalid report run URL",
 	);
 	const state = final
 		? report.state === "passed"

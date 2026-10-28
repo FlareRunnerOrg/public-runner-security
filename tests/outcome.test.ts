@@ -1,3 +1,4 @@
+import { repository } from "../scripts/contracts.ts";
 import { describe, expect, test } from "bun:test";
 import {
 	assertDenied,
@@ -21,8 +22,7 @@ const assigned: WorkflowJob = {
 			conclusion: "failure",
 		},
 	],
-	html_url:
-		"https://github.com/FlareRunnerOrg/public-runner-security/actions/runs/1",
+	html_url: `https://github.com/${repository}/actions/runs/1`,
 };
 describe("deployed denial evidence", () => {
 	test("accepts only an assigned runner's explicit pre-step denial", () =>

@@ -5,6 +5,17 @@
 This is FlareRunner’s public acceptance suite. It runs controlled attack fixtures
 against our production runners using a dummy secret and disposable branches.
 
+## Use the suite for your own assessment
+
+Start with the [independent assessor guide](ASSESSOR-GUIDE.md). It explains how to
+recheck public evidence with read-only access, configure a copy for your own
+FlareRunner workspace, run the complete campaign and record its limits. Use the
+[assessment template](ASSESSMENT-TEMPLATE.md) to keep results and evidence together.
+
+`security-suite.json` selects the repository being assessed. The upstream badge
+and historical qualification links in this README describe FlareRunner's own
+campaigns; they do not certify a copy or another workspace.
+
 ## Read the overall result
 
 Open the **Security acceptance** status on the tested commit or PR to view its
@@ -130,7 +141,8 @@ listings, unknown workflows, substituted paths, and the wrong repository.
 
 ## Scope of the evidence
 
-These tests use only FlareRunner-owned resources. They do not retrieve cloud
+Our upstream campaigns use only FlareRunner-owned resources. Independent campaigns
+must use resources their assessor is authorized to test. The probes do not retrieve cloud
 metadata credentials, exploit kernels, access customer data, or generate abusive
 traffic. No suite proves the absence of every vulnerability.
 
@@ -138,3 +150,8 @@ GitHub log masking does not prove masking in FlareRunner’s retained logs; the
 qualification driver checks that separately. Runner deregistration does not prove
 physical disk erasure; provider shutdown is separate evidence. An owned fork tests
 fork isolation, not GitHub’s approval behavior for an unrelated first-time contributor.
+
+## License
+
+This suite and its documentation are available under the [MIT License](LICENSE).
+Copyright (c) 2026 FlareRunner.

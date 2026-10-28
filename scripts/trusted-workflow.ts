@@ -44,7 +44,7 @@ export function assertTrustedVerifier(workflow: VerifierWorkflow): void {
 	const [checkout, runtime, verify] = job.steps;
 	assert.match(checkout.uses ?? "", /^actions\/checkout@[a-f0-9]{40}$/);
 	assert.deepEqual(checkout.with, {
-		repository: "FlareRunnerOrg/public-runner-security",
+		repository: "${{ github.repository }}",
 		ref: "${{ github.workflow_sha }}",
 		"persist-credentials": false,
 	});
@@ -137,7 +137,7 @@ export function assertTrustedPublisher(workflow: PublisherWorkflow): void {
 	assert.deepEqual(Object.keys(checkout).sort(), ["name", "uses", "with"]);
 	assert.match(checkout.uses ?? "", /^actions\/checkout@[a-f0-9]{40}$/);
 	assert.deepEqual(checkout.with, {
-		repository: "FlareRunnerOrg/public-runner-security",
+		repository: "${{ github.repository }}",
 		ref: "${{ github.workflow_sha }}",
 		"persist-credentials": false,
 	});

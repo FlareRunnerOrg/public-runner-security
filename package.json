@@ -1,12 +1,17 @@
 {
 	"name": "flarerunner-public-security-fixtures",
+	"license": "MIT",
 	"private": true,
 	"packageManager": "bun@1.4.4",
 	"scripts": {
 		"check": "tsc --noEmit && bun test",
 		"test": "bun test",
 		"probe": "bun tests/probe.ts",
-		"verify": "bun scripts/verify-run.ts"
+		"verify": "bun scripts/verify-run.ts",
+		"configure": "bun scripts/configure.ts",
+		"prepare-fork": "bun scripts/prepare-fork.ts",
+		"configure-canary": "bun scripts/configure-canary.ts",
+		"review": "bun scripts/review-acceptance.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "1.4.4",
